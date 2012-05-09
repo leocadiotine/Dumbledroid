@@ -17,7 +17,6 @@ public abstract class AbstractModel implements Serializable {
 
 	private static final String DEFAULT_ENCODING = HTTP.UTF_8;
 	
-	public String id;
 	public String url;
 	public String encoding;
 	public String error;
@@ -33,7 +32,7 @@ public abstract class AbstractModel implements Serializable {
 		encoding = _encoding;
 	}
 	
-	protected void load(Context ctx) throws Exception {
+	public void load(Context ctx) throws Exception {
 		load(ctx, null);
 	}
 	

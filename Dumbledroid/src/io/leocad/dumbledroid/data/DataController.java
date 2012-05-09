@@ -18,11 +18,6 @@ public class DataController {
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method)
 			throws Exception {
 
-		//Expand the URL
-		if (receiver.id != null) {
-			receiver.url = receiver.url.replace("{id}", receiver.id);
-		}
-
 		InputStream is = HttpLoader.makeRequest(receiver.url, receiver.encoding, params, method);
 
 		switch (dataType) {

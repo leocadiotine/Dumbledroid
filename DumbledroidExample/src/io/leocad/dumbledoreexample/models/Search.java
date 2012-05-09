@@ -13,22 +13,28 @@ import android.content.Context;
 
 public class Search extends AbstractModel {
 
-	private static final long serialVersionUID = 3019987888798071084L;
+	public double completed_in;
+	public int max_id;
+	public String query;
+	public List<Result> results;
 	
 	public Search() {
 		super("http://search.twitter.com/search.json");
 	}
 	
-	public void load(Context ctx, int resultsPerPage, String lang) throws Exception {
+	public void load(Context ctx, String query, int resultsPerPage, String lang) throws Exception {
 		
 		List<NameValuePair> params = new Vector<NameValuePair>();
 		
+		params.add( new BasicNameValuePair("q", query) );
 		params.add( new BasicNameValuePair("rpp", String.valueOf(resultsPerPage)) );
 		params.add( new BasicNameValuePair("lang", lang) );
 		
 		super.load(ctx, params);
 	}
 
+	private static final long serialVersionUID = 1L;
+	
 	@Override
 	protected DataType getDataType() {
 		return DataType.JSON;
