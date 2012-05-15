@@ -11,9 +11,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-public class ModelReflector {
+public class JsonReflector {
 
-	public static void reflectJson(Object model, String contentString) throws JSONException {
+	public static void reflectJsonString(Object model, String contentString) throws JSONException {
 
 		JSONObject jsonObj = null;
 		
@@ -29,10 +29,9 @@ public class ModelReflector {
 		} else {
 			reflectJsonArray(model, new JSONArray(contentString));
 		}
-		
 	}
 	
-	private static void reflectJsonObject(Object model, JSONObject jsonObj) throws JSONException {
+	public static void reflectJsonObject(Object model, JSONObject jsonObj) throws JSONException {
 		Class<?> modelClass = model.getClass();
 		JSONArray names = jsonObj.names();
 
@@ -51,16 +50,16 @@ public class ModelReflector {
 				}
 
 			} catch (NoSuchFieldException e) {
-				Log.w(ModelReflector.class.getName(), "Can not locate field named " + name);
+				Log.w(JsonReflector.class.getName(), "Can not locate field named " + name);
 
 			} catch (IllegalArgumentException e) {
-				Log.w(ModelReflector.class.getName(), "Can not put a String in the field named " + name);
+				Log.w(JsonReflector.class.getName(), "Can not put a String in the field named " + name);
 
 			} catch (IllegalAccessException e) {
-				Log.w(ModelReflector.class.getName(), "Can not access field named " + name);
+				Log.w(JsonReflector.class.getName(), "Can not access field named " + name);
 			
 			} catch (InstantiationException e) {
-				Log.w(ModelReflector.class.getName(), "Can not create an instance of the type defined in the field named " + name);
+				Log.w(JsonReflector.class.getName(), "Can not create an instance of the type defined in the field named " + name);
 			}
 		}
 	}
@@ -73,16 +72,16 @@ public class ModelReflector {
 			processListField(model, listField, jsonArray);
 			
 		} catch (NoSuchFieldException e) {
-			Log.w(ModelReflector.class.getName(), "Can not locate field named list");
+			Log.w(JsonReflector.class.getName(), "Can not locate field named list");
 			
 		} catch (IllegalArgumentException e) {
-			Log.w(ModelReflector.class.getName(), "Can not put a List in the field named list");
+			Log.w(JsonReflector.class.getName(), "Can not put a List in the field named list");
 			
 		} catch (IllegalAccessException e) {
-			Log.w(ModelReflector.class.getName(), "Can not access field named list");
+			Log.w(JsonReflector.class.getName(), "Can not access field named list");
 			
 		} catch (InstantiationException e) {
-			Log.w(ModelReflector.class.getName(), "Can not create an instance of the type defined in the field named list");
+			Log.w(JsonReflector.class.getName(), "Can not create an instance of the type defined in the field named list");
 		}
 	}
 

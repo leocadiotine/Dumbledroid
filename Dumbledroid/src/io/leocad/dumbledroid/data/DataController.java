@@ -1,5 +1,7 @@
 package io.leocad.dumbledroid.data;
 
+import io.leocad.dumbledroid.data.xml.Node;
+import io.leocad.dumbledroid.data.xml.SaxParser;
 import io.leocad.dumbledroid.net.HttpLoader;
 import io.leocad.dumbledroid.net.HttpMethod;
 
@@ -9,6 +11,7 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.json.JSONException;
+import org.xml.sax.SAXException;
 
 import android.content.Context;
 
@@ -24,6 +27,10 @@ public class DataController {
 		case JSON:
 			processJson(receiver, is);
 			break;
+		
+		case XML:
+			processXml(receiver, is);
+			break;
 		}
 	}
 
@@ -31,6 +38,12 @@ public class DataController {
 			throws IOException, JSONException, InstantiationException {
 
 		String content = HttpLoader.streamToString(is);
-		ModelReflector.reflectJson(receiver, content);
+		JsonReflector.reflectJsonString(receiver, content);
+	}
+	
+	private static void processXml(AbstractModel receiver, InputStream is) throws SAXException, IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+		
+		Node parsedNode = SaxParser.parse(is, receiver.encoding);
+		XmlReflector.reflectXmlObject(receiver, parsedNode);
 	}
 }
