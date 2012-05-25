@@ -20,6 +20,8 @@ public abstract class AbstractModel implements Serializable {
 	public String url;
 	public String encoding;
 	public String error;
+
+	public long cacheDuration;
 	
 	protected abstract DataType getDataType();
 	

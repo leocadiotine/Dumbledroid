@@ -21,25 +21,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class HttpLoader {
 
-	public static InputStream makeRequest(String url, String encoding,
-			List<NameValuePair> params, HttpMethod method)
-					throws IOException {
+	public static HttpResponse getHttpResponse(String url, String encoding, List<NameValuePair> params, HttpMethod method) throws IOException {
 
 		HttpUriRequest request = getHttpRequest(url, encoding, params, method);
 
 		HttpClient client = new DefaultHttpClient();
 
 		try {
-			HttpResponse response = client.execute(request);
-			HttpEntity entity = response.getEntity();
-
-			if (null != entity) {
-				return entity.getContent();
-			}
-
-			return null;
-
-
+			return client.execute(request);
+			
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 			client.getConnectionManager().shutdown();
@@ -51,12 +41,23 @@ public class HttpLoader {
 		}
 	}
 
+	public static InputStream getHttpContent(HttpResponse response) throws IllegalStateException, IOException {
+
+		HttpEntity entity = response.getEntity();
+
+		if (null != entity) {
+			return entity.getContent();
+		}
+
+		return null;
+	}
+
 	private static HttpUriRequest getHttpRequest(String url, String encoding,
 			List<NameValuePair> params, HttpMethod method)
 					throws UnsupportedEncodingException {
 
 		HttpUriRequest request;
-		
+
 		if (null == method) {
 			method = HttpMethod.GET;
 		}
@@ -102,7 +103,7 @@ public class HttpLoader {
 	public static String streamToString(InputStream is) throws IOException {
 
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
-		
+
 		StringBuilder total = new StringBuilder();
 		String line;
 		while ((line = r.readLine()) != null) {
