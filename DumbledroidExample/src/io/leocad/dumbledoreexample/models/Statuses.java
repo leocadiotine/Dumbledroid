@@ -5,17 +5,14 @@ import io.leocad.dumbledroid.data.DataType;
 
 import java.util.List;
 
-public class Sith extends AbstractModel {
+public class Statuses extends AbstractModel {
 
 	private static final long serialVersionUID = 1L;
 	
-	public String side;
-	public List<String> names;
-	public Suit suit;
-	public int kills;
+	public List<Status> statuses;
 
-	public Sith() {
-		super("http://dl.dropbox.com/u/5135185/presentation/sith.xml", 60 * 60 * 1000); //1 hour cache
+	public Statuses() {
+		super("https://api.twitter.com/1/statuses/public_timeline.xml?count=3&include_entities=true", 60 * 60 * 1000); //1 hour cache
 	}
 	
 	@Override

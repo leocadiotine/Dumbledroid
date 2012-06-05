@@ -11,7 +11,20 @@ import android.util.Log;
 
 public class XmlReflector {
 
-	public static void reflectXmlObject(Object model, Node node) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public static void reflectXmlRootNode(Object model, Node node) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+		
+		//Check if the root node is an array
+		Class<?> modelClass = model.getClass();
+		Field rootNodeField = modelClass.getField(node.name);
+		
+		if (rootNodeField.getType() == List.class) {
+			processListField(model, rootNodeField, node);
+		} else {
+			reflectXmlObject(model, node);
+		}
+	}
+	
+	private static void reflectXmlObject(Object model, Node node) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		
 		Class<?> modelClass = model.getClass();
 		

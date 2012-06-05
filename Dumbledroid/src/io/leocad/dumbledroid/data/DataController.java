@@ -87,10 +87,10 @@ public class DataController {
 		JsonReflector.reflectJsonString(receiver, content);
 	}
 
-	private static void processXml(AbstractModel receiver, InputStream is) throws SAXException, IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	private static void processXml(AbstractModel receiver, InputStream is) throws SAXException, IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException {
 
 		Node parsedNode = SaxParser.parse(is, receiver.encoding);
-		XmlReflector.reflectXmlObject(receiver, parsedNode);
+		XmlReflector.reflectXmlRootNode(receiver, parsedNode);
 	}
 
 	private static String getKey(AbstractModel model, List<NameValuePair> params) {
