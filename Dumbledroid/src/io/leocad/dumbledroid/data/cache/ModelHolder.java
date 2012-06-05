@@ -4,12 +4,12 @@ import io.leocad.dumbledroid.data.AbstractModel;
 
 import java.io.Serializable;
 
-class ModelHolder implements Serializable {
+public class ModelHolder implements Serializable {
 
 	private static final long serialVersionUID = -884696290834846261L;
 	
 	public AbstractModel model;
-	private long timestamp;
+	public long timestamp;
 
 	public ModelHolder(AbstractModel model, long timestamp) {
 		this.model = model;

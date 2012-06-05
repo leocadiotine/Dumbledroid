@@ -51,23 +51,17 @@ public class DiskCache {
 		}
 	}
 	
-	public AbstractModel getCachedOrNull(String key) {
+	public ModelHolder getCached(String key) {
 		
 		String fileName = String.valueOf(key.hashCode());
+		
 		try {
 			FileInputStream fis = mFileCtrl.getFileInputStream(fileName);
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			
 			ModelHolder holder = (ModelHolder) ois.readObject();
 			
-			if (holder == null || holder.isExpired()) {
-				//Expired: erase file
-				mFileCtrl.erase(fileName);
-				Log.v(TAG, "Expired from disk! Deleting " + fileName);
-				return null;
-			}
-			
-			return holder.model;
+			return holder;
 		
 		} catch (Exception e) {
 			Log.w(TAG, "Can't access file: " + fileName, e);
