@@ -28,10 +28,19 @@ public abstract class AbstractModel implements Serializable {
 	protected AbstractModel(String url) {
 		this(url, DEFAULT_ENCODING);
 	}
+	
+	protected AbstractModel(String _url, long _cacheDuration) {
+		this(_url, DEFAULT_ENCODING, _cacheDuration);
+	}
 
 	protected AbstractModel(String _url, String _encoding) {
+		this(_url, _encoding, -1L);
+	}
+	
+	protected AbstractModel(String _url, String _encoding, long _cacheDuration) {
 		url = _url;
 		encoding = _encoding;
+		cacheDuration = _cacheDuration;
 	}
 	
 	public void load(Context ctx) throws Exception {

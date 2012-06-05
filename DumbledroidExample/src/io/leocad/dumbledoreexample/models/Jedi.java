@@ -14,7 +14,7 @@ public class Jedi extends AbstractModel {
 	public String father;
 
 	public Jedi() {
-		super("http://dl.dropbox.com/u/5135185/presentation/jedi.json");
+		super("http://dl.dropbox.com/u/5135185/presentation/jedi.json", 15 * 60 * 1000); //15 min cache
 	}
 	
 	@Override

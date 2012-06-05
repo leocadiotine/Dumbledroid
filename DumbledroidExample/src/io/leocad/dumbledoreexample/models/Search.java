@@ -19,7 +19,7 @@ public class Search extends AbstractModel {
 	public List<Result> results;
 	
 	public Search() {
-		super("http://search.twitter.com/search.json");
+		super("http://search.twitter.com/search.json", 30 * 1000); //30 seconds cache
 	}
 	
 	public void load(Context ctx, String query, int resultsPerPage, String lang) throws Exception {

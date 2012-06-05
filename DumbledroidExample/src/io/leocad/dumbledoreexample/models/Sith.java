@@ -15,7 +15,7 @@ public class Sith extends AbstractModel {
 	public int kills;
 
 	public Sith() {
-		super("http://dl.dropbox.com/u/5135185/presentation/sith.xml");
+		super("http://dl.dropbox.com/u/5135185/presentation/sith.xml", 60 * 60 * 1000); //1 hour cache
 	}
 	
 	@Override
