@@ -11,16 +11,16 @@ import android.os.Environment;
 
 public class FileController {
 
-	private static String EXTERNAL_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/Android/data/";
+	private static String EXTERNAL_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/data/data/";
 
-	private Context mContext;
+	private final Context mContext;
 	private String mExternalDataDirectory;
 
 	public FileController(Context ctx) {
 		mContext = ctx;
 
 		if (isSdCardAvailable()) {
-			mExternalDataDirectory = EXTERNAL_DATA_DIRECTORY + mContext.getPackageName() + "/cache/";
+			mExternalDataDirectory = EXTERNAL_DATA_DIRECTORY + mContext.getPackageName() + "/";
 
 			//Create the directory (if it doesn't exists)
 			File directory = new File(mExternalDataDirectory);
@@ -66,11 +66,11 @@ public class FileController {
 
 		if (isSdCardAvailable()) {
 			file = new File(mExternalDataDirectory + fileName);
-			
+
 		} else  {
 			file = mContext.getFileStreamPath(fileName);
 		}
-		
+
 		file.delete();
 	}
 
