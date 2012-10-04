@@ -5,37 +5,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 public class HttpLoader {
 
-	public static HttpResponse getHttpResponse(String url, String encoding, List<NameValuePair> params, HttpMethod method) throws IOException {
+	static final int REQUEST_TIMEOUT_MS = 10 * 1000;
+
+	public static HttpResponse getHttpResponse(String url, String encoding, List<NameValuePair> params, HttpMethod method) throws TimeoutException, IOException {
 
 		HttpUriRequest request = getHttpRequest(url, encoding, params, method);
 
-		HttpClient client = new DefaultHttpClient();
+		HttpParams httpParams = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParams, REQUEST_TIMEOUT_MS);
+		HttpConnectionParams.setSoTimeout(httpParams, REQUEST_TIMEOUT_MS);
+
+		HttpClient client = new DefaultHttpClient(httpParams);
 
 		try {
 			return client.execute(request);
-			
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+
+		} catch (ConnectTimeoutException e) {
 			client.getConnectionManager().shutdown();
-			throw e;
+			throw new TimeoutException(e);
+		} catch (SocketTimeoutException e) {
+			client.getConnectionManager().shutdown();
+			throw new TimeoutException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
 			client.getConnectionManager().shutdown();
 			throw e;
 		}
