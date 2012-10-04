@@ -30,34 +30,36 @@ public class DataController {
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
 
-		//Get cached version
+		HttpResponse httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
 		String cacheKey = getKey(receiver, params);
 
-		//In memory
-		AbstractModel cached = MemoryCache.getInstance().getCachedOrNull(cacheKey);
-		if (cached != null && ObjectCopier.copy(cached, receiver)) {
-			return;
-		}
+		//Get cached version
+		if (receiver.cacheDuration > 0) {
 
-		//In disk
-		ModelHolder modelHolder = DiskCache.getInstance(ctx).getCached(cacheKey);
-		if (modelHolder != null && !modelHolder.isExpired() && ObjectCopier.copy(modelHolder.model, receiver)) {
-			return;
-		}
-
-		HttpResponse httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
-
-		// Check also if it was modified on the server before downloading it
-		Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
-		if (lastModHeader != null) {
-			String lastMod = lastModHeader.getValue();
-			long lastModTimeMillis = DATE_FORMATTER.parse(lastMod).getTime();
-
-			if ( modelHolder!= null && lastModTimeMillis <= modelHolder.timestamp ) {
-
-				//Discard the connection and return the cached version
-				ObjectCopier.copy(modelHolder.model, receiver);
+			//In memory
+			AbstractModel cached = MemoryCache.getInstance().getCachedOrNull(cacheKey);
+			if (cached != null && ObjectCopier.copy(cached, receiver)) {
 				return;
+			}
+
+			//In disk
+			ModelHolder modelHolder = DiskCache.getInstance(ctx).getCached(cacheKey);
+			if (modelHolder != null && !modelHolder.isExpired() && ObjectCopier.copy(modelHolder.model, receiver)) {
+				return;
+			}
+
+			// Check also if it was modified on the server before downloading it
+			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
+			if (lastModHeader != null) {
+				String lastMod = lastModHeader.getValue();
+				long lastModTimeMillis = DATE_FORMATTER.parse(lastMod).getTime();
+
+				if ( modelHolder!= null && lastModTimeMillis <= modelHolder.timestamp ) {
+
+					//Discard the connection and return the cached version
+					ObjectCopier.copy(modelHolder.model, receiver);
+					return;
+				}
 			}
 		}
 
