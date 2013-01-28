@@ -1,6 +1,6 @@
 package io.leocad.dumbledoreexample.activities;
 
-import io.leocad.dumbledoreexample.models.Statuses;
+import io.leocad.dumbledoreexample.models.LookupUsers;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,40 +36,17 @@ public class DumbledroidExampleActivity extends Activity {
 		//			}
 		//		}.execute();
 		//		
-		//Test "Search" object
-//		new AsyncTask<Void, Void, Search>() {
-//
-//			@Override
-//			protected Search doInBackground(Void... params) {
-//
-//				try {
-//					Search search = new Search();
-//					search.load(DumbledroidExampleActivity.this, "android", 10, "en");
-//					return search;
-//
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					return null;
-//				}
-//			}
-//
-//			@Override
-//			protected void onPostExecute(Search search) {
-//
-//				Log.v("Dumbledroid", search.toString());
-//			}
-//		}.execute();
-
-		//Test "Statuses" object
-		new AsyncTask<Void, Void, Statuses>() {
+		
+		//Test "LookupUsers" object
+		new AsyncTask<Void, Void, LookupUsers>() {
 
 			@Override
-			protected Statuses doInBackground(Void... params) {
+			protected LookupUsers doInBackground(Void... params) {
 
 				try {
-					Statuses statuses = new Statuses();
-					statuses.load(DumbledroidExampleActivity.this);
-					return statuses;
+					LookupUsers lu = new LookupUsers();
+					lu.load(DumbledroidExampleActivity.this);
+					return lu;
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -78,10 +55,34 @@ public class DumbledroidExampleActivity extends Activity {
 			}
 
 			@Override
-			protected void onPostExecute(Statuses statuses) {
+			protected void onPostExecute(LookupUsers lu) {
 
-				Log.v("Dumbledroid", statuses.toString());
+				Log.v("Dumbledroid", lu.toString());
 			}
 		}.execute();
+
+		//Test "Statuses" object
+//		new AsyncTask<Void, Void, LookupUsers>() {
+//
+//			@Override
+//			protected LookupUsers doInBackground(Void... params) {
+//
+//				try {
+//					LookupUsers statuses = new LookupUsers();
+//					statuses.load(DumbledroidExampleActivity.this);
+//					return statuses;
+//
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					return null;
+//				}
+//			}
+//
+//			@Override
+//			protected void onPostExecute(LookupUsers statuses) {
+//
+//				Log.v("Dumbledroid", statuses.toString());
+//			}
+//		}.execute();
 	}
 }
