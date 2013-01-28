@@ -15,11 +15,25 @@ public class XmlReflector {
 
 		//Check if the root node is an array
 		Class<?> modelClass = model.getClass();
-		Field rootNodeField = modelClass.getField(node.name);
+		Field rootNodeField = null;
+		
+		try {
+			rootNodeField = modelClass.getField(node.name);
+			
+		} catch (NoSuchFieldException e) {
+		}
 
-		if (rootNodeField.getType() == List.class) {
-			processListField(model, rootNodeField, node);
+		//The developer has declared a field to match the root node
+		if (rootNodeField != null){
+			
+			if (rootNodeField.getType() == List.class) {
+				processListField(model, rootNodeField, node);
+			} else {
+				reflectXmlObject(model, node);
+			}
+			
 		} else {
+			//The developer has mapped the root node to the object itself
 			reflectXmlObject(model, node);
 		}
 	}
