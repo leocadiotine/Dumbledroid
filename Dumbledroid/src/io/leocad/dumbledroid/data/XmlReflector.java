@@ -11,27 +11,28 @@ import android.util.Log;
 
 public class XmlReflector {
 
-	public static void reflectXmlRootNode(Object model, Node node) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+	public static void reflectXmlRootNode(Object model, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 
 		//Check if the root node is an array
 		Class<?> modelClass = model.getClass();
 		Field rootNodeField = null;
-		
+
 		try {
-			rootNodeField = modelClass.getField(node.name);
-			
+			rootNodeField = modelClass.getDeclaredField(node.name);
+			rootNodeField.setAccessible(true);
+
 		} catch (NoSuchFieldException e) {
 		}
 
 		//The developer has declared a field to match the root node
 		if (rootNodeField != null){
-			
+
 			if (rootNodeField.getType() == List.class) {
 				processListField(model, rootNodeField, node);
 			} else {
 				reflectXmlObject(model, node);
 			}
-			
+
 		} else {
 			//The developer has mapped the root node to the object itself
 			reflectXmlObject(model, node);
@@ -41,18 +42,18 @@ public class XmlReflector {
 	private static void reflectXmlObject(Object model, Node node) {
 
 		Class<?> modelClass = model.getClass();
-		String fieldName = null;
 
-		try {
+		//Treat attributes like fields
+		if (node.attributes != null) {
+			for (String key : node.attributes.keySet()) {
 
-			//Treat attributes like fields
-			if (node.attributes != null) {
-				for (String key : node.attributes.keySet()) {
+				String value = node.attributes.get(key);
 
-					fieldName = key;
-					String value = node.attributes.get(key);
 
-					Field field = modelClass.getField(key);
+				try {
+					Field field = modelClass.getDeclaredField(key);
+					field.setAccessible(true);
+
 					Class<?> type = field.getType();
 
 					if (type == String.class) {
@@ -68,15 +69,23 @@ public class XmlReflector {
 						field.set(model, Double.valueOf(value));
 
 					}
+				} catch (NoSuchFieldException e) {
+					Log.w(XmlReflector.class.getName(), "Can not locate field named " + key);
+
+				} catch (IllegalAccessException e) {
+					Log.w(XmlReflector.class.getName(), "Can not access field named " + key);
+
 				}
 			}
+		}
 
-			for (int i = 0; i < node.subnodes.size(); i++) {
+		for (int i = 0; i < node.subnodes.size(); i++) {
 
-				Node subnode = node.subnodes.get(i);
+			Node subnode = node.subnodes.get(i);
 
-				fieldName = subnode.name;
-				Field field = modelClass.getField(subnode.name);
+			try {
+				Field field = modelClass.getDeclaredField(subnode.name);
+				field.setAccessible(true);
 
 				if (field.getType() == List.class) {
 					processListField(model, field, subnode);
@@ -85,20 +94,18 @@ public class XmlReflector {
 					processSingleField(model, field, subnode);
 				}
 
+			} catch (NoSuchFieldException e) {
+				Log.w(XmlReflector.class.getName(), "Can not locate field named " + subnode.name);
+
+			} catch (IllegalAccessException e) {
+				Log.w(XmlReflector.class.getName(), "Can not access field named " + subnode.name);
+
+			} catch (InstantiationException e) {
+				Log.w(XmlReflector.class.getName(), "Can not create an instance of the type defined in the field named " + subnode.name);
 			}
-			
-		} catch (NoSuchFieldException e) {
-			Log.w(XmlReflector.class.getName(), "Can not locate field named " + fieldName);
 
-		} catch (IllegalArgumentException e) {
-			Log.w(XmlReflector.class.getName(), "Can not put a String in the field named " + fieldName);
-
-		} catch (IllegalAccessException e) {
-			Log.w(XmlReflector.class.getName(), "Can not access field named " + fieldName);
-
-		} catch (InstantiationException e) {
-			Log.w(XmlReflector.class.getName(), "Can not create an instance of the type defined in the field named " + fieldName);
 		}
+
 	}
 
 	private static void processSingleField(Object model, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException {

@@ -40,7 +40,8 @@ public class JsonReflector {
 			String name = names.getString(i);
 
 			try {
-				Field field = modelClass.getField(name);
+				Field field = modelClass.getDeclaredField(name);
+				field.setAccessible(true);
 
 				if (field.getType() == List.class) {
 					processListField(model, field, jsonObj.getJSONArray(name));
@@ -51,9 +52,6 @@ public class JsonReflector {
 
 			} catch (NoSuchFieldException e) {
 				Log.w(JsonReflector.class.getName(), "Can not locate field named " + name);
-
-			} catch (IllegalArgumentException e) {
-				Log.w(JsonReflector.class.getName(), "Can not put a String in the field named " + name);
 
 			} catch (IllegalAccessException e) {
 				Log.w(JsonReflector.class.getName(), "Can not access field named " + name);
@@ -68,7 +66,9 @@ public class JsonReflector {
 		
 		Class<?> modelClass = model.getClass();
 		try {
-			Field listField = modelClass.getField("list");
+			Field listField = modelClass.getDeclaredField("list");
+			listField.setAccessible(true);
+			
 			processListField(model, listField, jsonArray);
 			
 		} catch (NoSuchFieldException e) {
@@ -85,8 +85,7 @@ public class JsonReflector {
 		}
 	}
 
-	private static void processSingleField(Object model, Field field, JSONObject jsonObj, String nodeName)
-			throws JSONException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+	private static void processSingleField(Object model, Field field, JSONObject jsonObj, String nodeName) throws IllegalArgumentException, IllegalAccessException, JSONException, InstantiationException {
 
 		Class<?> type = field.getType();
 
@@ -123,8 +122,7 @@ public class JsonReflector {
 		}
 	}
 
-	private static void processListField(Object object, Field field, JSONArray jsonArray)
-			throws JSONException, IllegalArgumentException, IllegalAccessException, InstantiationException {
+	private static void processListField(Object object, Field field, JSONArray jsonArray) throws IllegalArgumentException, IllegalAccessException, JSONException, InstantiationException {
 
 		ParameterizedType genericType = (ParameterizedType) field.getGenericType();
 		Class<?> childrenType = (Class<?>) genericType.getActualTypeArguments()[0];
@@ -132,7 +130,7 @@ public class JsonReflector {
 		field.set(object, getList(jsonArray, childrenType));
 	}
 
-	private static List<?> getList(JSONArray jsonArray, Class<?> childrenType) throws JSONException, InstantiationException, IllegalAccessException {
+	private static List<?> getList(JSONArray jsonArray, Class<?> childrenType) throws JSONException, IllegalAccessException, InstantiationException {
 
 		List<Object> list = new Vector<Object>(jsonArray.length());
 
