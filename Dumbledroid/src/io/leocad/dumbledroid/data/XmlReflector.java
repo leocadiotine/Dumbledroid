@@ -12,52 +12,56 @@ import android.util.Log;
 public class XmlReflector {
 
 	public static void reflectXmlRootNode(Object model, Node node) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException {
-		
+
 		//Check if the root node is an array
 		Class<?> modelClass = model.getClass();
 		Field rootNodeField = modelClass.getField(node.name);
-		
+
 		if (rootNodeField.getType() == List.class) {
 			processListField(model, rootNodeField, node);
 		} else {
 			reflectXmlObject(model, node);
 		}
 	}
-	
-	private static void reflectXmlObject(Object model, Node node) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		
+
+	private static void reflectXmlObject(Object model, Node node) {
+
 		Class<?> modelClass = model.getClass();
-		
-		//Treat attributes like fields
-		if (node.attributes != null) {
-			for (String key : node.attributes.keySet()) {
-				
-				String value = node.attributes.get(key);
-				
-				Field field = modelClass.getField(key);
-				Class<?> type = field.getType();
-				
-				if (type == String.class) {
-					field.set(model, value);
+		String fieldName = null;
 
-				} else if (type == boolean.class || type == Boolean.class) {
-					field.set(model, Boolean.valueOf(value));
+		try {
 
-				} else if (type == int.class || type == Integer.class) {
-					field.set(model, Integer.valueOf(value));
+			//Treat attributes like fields
+			if (node.attributes != null) {
+				for (String key : node.attributes.keySet()) {
 
-				} else if (type == double.class || type == Double.class) {
-					field.set(model, Double.valueOf(value));
+					fieldName = key;
+					String value = node.attributes.get(key);
 
+					Field field = modelClass.getField(key);
+					Class<?> type = field.getType();
+
+					if (type == String.class) {
+						field.set(model, value);
+
+					} else if (type == boolean.class || type == Boolean.class) {
+						field.set(model, Boolean.valueOf(value));
+
+					} else if (type == int.class || type == Integer.class) {
+						field.set(model, Integer.valueOf(value));
+
+					} else if (type == double.class || type == Double.class) {
+						field.set(model, Double.valueOf(value));
+
+					}
 				}
 			}
-		}
 
-		for (int i = 0; i < node.subnodes.size(); i++) {
+			for (int i = 0; i < node.subnodes.size(); i++) {
 
-			Node subnode = node.subnodes.get(i);
+				Node subnode = node.subnodes.get(i);
 
-			try {
+				fieldName = subnode.name;
 				Field field = modelClass.getField(subnode.name);
 
 				if (field.getType() == List.class) {
@@ -67,29 +71,30 @@ public class XmlReflector {
 					processSingleField(model, field, subnode);
 				}
 
-			} catch (NoSuchFieldException e) {
-				Log.w(XmlReflector.class.getName(), "Can not locate field named " + subnode.name);
-
-			} catch (IllegalArgumentException e) {
-				Log.w(XmlReflector.class.getName(), "Can not put a String in the field named " + subnode.name);
-
-			} catch (IllegalAccessException e) {
-				Log.w(XmlReflector.class.getName(), "Can not access field named " + subnode.name);
-			
-			} catch (InstantiationException e) {
-				Log.w(XmlReflector.class.getName(), "Can not create an instance of the type defined in the field named " + subnode.name);
 			}
+			
+		} catch (NoSuchFieldException e) {
+			Log.w(XmlReflector.class.getName(), "Can not locate field named " + fieldName);
+
+		} catch (IllegalArgumentException e) {
+			Log.w(XmlReflector.class.getName(), "Can not put a String in the field named " + fieldName);
+
+		} catch (IllegalAccessException e) {
+			Log.w(XmlReflector.class.getName(), "Can not access field named " + fieldName);
+
+		} catch (InstantiationException e) {
+			Log.w(XmlReflector.class.getName(), "Can not create an instance of the type defined in the field named " + fieldName);
 		}
 	}
 
-	private static void processSingleField(Object model, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException, SecurityException, NoSuchFieldException {
+	private static void processSingleField(Object model, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 
 		Class<?> type = field.getType();
 
 		field.set(model, getObject(node, type));
 	}
 
-	private static Object getObject(Node node, Class<?> type) throws InstantiationException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	private static Object getObject(Node node, Class<?> type) throws InstantiationException {
 
 		if (type == String.class) {
 			return node.text;
@@ -107,19 +112,19 @@ public class XmlReflector {
 			Object obj;
 			try {
 				obj = type.newInstance();
-				
+
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 				return null;
 			}
-			
+
 			reflectXmlObject(obj, node);
-			
+
 			return obj;
 		}
 	}
 
-	private static void processListField(Object object, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException, SecurityException, NoSuchFieldException {
+	private static void processListField(Object object, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 
 		ParameterizedType genericType = (ParameterizedType) field.getGenericType();
 		Class<?> childrenType = (Class<?>) genericType.getActualTypeArguments()[0];
@@ -127,7 +132,7 @@ public class XmlReflector {
 		field.set(object, getList(node, childrenType));
 	}
 
-	private static List<?> getList(Node node, Class<?> childrenType) throws InstantiationException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	private static List<?> getList(Node node, Class<?> childrenType) throws InstantiationException {
 
 		List<Object> list = new Vector<Object>(node.subnodes.size());
 
