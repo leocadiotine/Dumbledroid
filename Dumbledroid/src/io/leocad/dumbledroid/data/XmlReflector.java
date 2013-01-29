@@ -28,7 +28,7 @@ public class XmlReflector {
 		if (rootNodeField != null) {
 
 			if (rootNodeField.getType() == List.class) {
-				processListField(model, rootNodeField, node);
+				processListField(model, rootNodeField, node, null);
 			} else {
 				reflectXmlObject(model, node);
 			}
@@ -84,23 +84,23 @@ public class XmlReflector {
 			for (int i = 0; i < node.subnodes.size(); i++) {
 
 				Node subnode = node.subnodes.get(i);
-				accessFieldAndProcess(model, modelClass, subnode);
+				accessFieldAndProcess(model, modelClass, subnode, node);
 			}
-			
+
 		} else {
 			//This node has no children (hope it has a wife).
-			accessFieldAndProcess(model, modelClass, node);
+			accessFieldAndProcess(model, modelClass, node, null);
 		}
 	}
 
-	private static void accessFieldAndProcess(Object model, Class<?> modelClass, Node node) {
-		
+	private static void accessFieldAndProcess(Object model, Class<?> modelClass, Node node, Node parentNode) {
+
 		try {
 			Field field = modelClass.getDeclaredField(node.name);
 			field.setAccessible(true);
 
 			if (field.getType() == List.class) {
-				processListField(model, field, node);
+				processListField(model, field, node, parentNode);
 
 			} else {
 				processSingleField(model, field, node);
@@ -154,33 +154,85 @@ public class XmlReflector {
 		}
 	}
 
-	private static void processListField(Object object, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
+	private static void processListField(Object object, Field field, Node node, Node parentNode) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 
 		ParameterizedType genericType = (ParameterizedType) field.getGenericType();
 		Class<?> childrenType = (Class<?>) genericType.getActualTypeArguments()[0];
 
-		field.set(object, getList(node, childrenType));
+		field.set(object, getList(node, childrenType, parentNode));
 	}
 
-	private static List<?> getList(Node node, Class<?> childrenType) throws InstantiationException {
+	private static List<?> getList(Node node, Class<?> childrenType, Node parentNode) throws InstantiationException {
 
-		List<Object> list = new Vector<Object>(node.subnodes.size());
+		/*
+		 * First, we need to determine which kind of list is this. In XML, we can have two kinds:
+		 * 
+		 * Type 1:
+		 * <root>
+		 *     <listChild>
+		 *         <childMember1 />
+		 *         <childMember2 />
+		 *     </listChild>
+		 *     <listChild>
+		 *         <childMember1 />
+		 *         <childMember2 />
+		 *     </listChild>
+		 * </root>
+		 * 
+		 * Type 2:
+		 * <root>
+		 *     <list>
+		 *         <listChild>
+		 *             <childMember1 />
+		 *             <childMember2 />
+		 *         </listChild>
+		 *     </list>
+		 * </root>
+		 * 
+		 * To determine that, we must check if a node has siblings with the same name as it. If so,
+		 * it's a list of the type 1.
+		 */
 
-		for (int i = 0; i < node.subnodes.size(); i++) {
+		List<Node> listNodes;
+		if (parentNode == null) {
+			//This is a root node and has no siblings. So it can only be a list of type 2
+			listNodes = node.subnodes;
+		} else {
 
-			Object child = null;
-			Node subnode = node.subnodes.get(i);
+			//Defaults to type 1
+			listNodes = parentNode.getChildrenByName(node.name);
 
-			if (childrenType == List.class) {
-				child = getList(subnode, childrenType);
-
-			} else {
-				child = getObject(subnode, childrenType);
+			if (listNodes.size() <= 1) {
+				//Type 2
+				listNodes = node.subnodes; 
+				parentNode = node;
 			}
-
-			list.add(child);
 		}
 
-		return list;
+		if (listNodes != null) {
+
+			List<Object> list = new Vector<Object>(listNodes.size());
+
+			for (int i = 0; i < listNodes.size(); i++) {
+
+				Object child = null;
+				Node subnode = listNodes.get(i);
+
+				if (childrenType == List.class) {
+					child = getList(subnode, childrenType, parentNode);
+
+				} else {
+					child = getObject(subnode, childrenType);
+				}
+
+				list.add(child);
+			}
+
+			return list;
+			
+		} else {
+			Log.w(XmlReflector.class.getName(), "The field named " + node.name + " has no children nor namesakes and has been declared as a List. Will be null.");
+			return null;
+		}
 	}
 }
