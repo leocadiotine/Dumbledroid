@@ -25,7 +25,7 @@ public class XmlReflector {
 		}
 
 		//The developer has declared a field to match the root node
-		if (rootNodeField != null){
+		if (rootNodeField != null) {
 
 			if (rootNodeField.getType() == List.class) {
 				processListField(model, rootNodeField, node);
@@ -79,33 +79,42 @@ public class XmlReflector {
 			}
 		}
 
-		for (int i = 0; i < node.subnodes.size(); i++) {
+		if (node.subnodes != null) {
 
-			Node subnode = node.subnodes.get(i);
+			for (int i = 0; i < node.subnodes.size(); i++) {
 
-			try {
-				Field field = modelClass.getDeclaredField(subnode.name);
-				field.setAccessible(true);
+				Node subnode = node.subnodes.get(i);
+				accessFieldAndProcess(model, modelClass, subnode);
+			}
+			
+		} else {
+			//This node has no children (hope it has a wife).
+			accessFieldAndProcess(model, modelClass, node);
+		}
+	}
 
-				if (field.getType() == List.class) {
-					processListField(model, field, subnode);
+	private static void accessFieldAndProcess(Object model, Class<?> modelClass, Node node) {
+		
+		try {
+			Field field = modelClass.getDeclaredField(node.name);
+			field.setAccessible(true);
 
-				} else {
-					processSingleField(model, field, subnode);
-				}
+			if (field.getType() == List.class) {
+				processListField(model, field, node);
 
-			} catch (NoSuchFieldException e) {
-				Log.w(XmlReflector.class.getName(), "Can not locate field named " + subnode.name);
-
-			} catch (IllegalAccessException e) {
-				Log.w(XmlReflector.class.getName(), "Can not access field named " + subnode.name);
-
-			} catch (InstantiationException e) {
-				Log.w(XmlReflector.class.getName(), "Can not create an instance of the type defined in the field named " + subnode.name);
+			} else {
+				processSingleField(model, field, node);
 			}
 
-		}
+		} catch (NoSuchFieldException e) {
+			Log.w(XmlReflector.class.getName(), "Can not locate field named " + node.name);
 
+		} catch (IllegalAccessException e) {
+			Log.w(XmlReflector.class.getName(), "Can not access field named " + node.name);
+
+		} catch (InstantiationException e) {
+			Log.w(XmlReflector.class.getName(), "Can not create an instance of the type defined in the field named " + node.name);
+		}
 	}
 
 	private static void processSingleField(Object model, Field field, Node node) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
