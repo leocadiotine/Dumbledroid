@@ -11,13 +11,12 @@ import io.leocad.dumbledroid.net.HttpMethod;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.impl.cookie.DateUtils;
 import org.json.JSONException;
 import org.xml.sax.SAXException;
 
@@ -25,8 +24,6 @@ import android.content.Context;
 
 
 public class DataController {
-
-	private static DateFormat DATE_FORMATTER = new SimpleDateFormat("EEE',' dd MMM yyyy HH:mm:ss zzz");;
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
 
@@ -52,7 +49,7 @@ public class DataController {
 			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
 			if (lastModHeader != null) {
 				String lastMod = lastModHeader.getValue();
-				long lastModTimeMillis = DATE_FORMATTER.parse(lastMod).getTime();
+				long lastModTimeMillis = DateUtils.parseDate(lastMod).getTime();
 
 				if ( modelHolder!= null && lastModTimeMillis <= modelHolder.timestamp ) {
 
