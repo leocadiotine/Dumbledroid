@@ -51,8 +51,8 @@ public class FileController {
 
 			if (!file.exists()) {
 				file.createNewFile();
-				fos = new FileOutputStream(file);
 			}
+			fos = new FileOutputStream(file);
 
 		} else {
 			fos = mContext.openFileOutput(filename, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE);
