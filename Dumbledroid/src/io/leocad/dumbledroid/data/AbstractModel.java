@@ -52,6 +52,16 @@ public abstract class AbstractModel implements Serializable {
 	}
 	
 	protected void load(Context ctx, List<NameValuePair> params, HttpMethod method) throws Exception {
+		checkConnection(ctx);
 		DataController.load(ctx, this, getDataType(), params, method);
+	}
+
+	private void checkConnection(Context ctx) throws NoConnectionException {
+		ConnectivityManager cm = (ConnectivityManager)
+		ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+	        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	        if (netInfo == null || !netInfo.isConnectedOrConnecting()) {
+	            throw new NoConnectionException();
+	        }
 	}
 }
