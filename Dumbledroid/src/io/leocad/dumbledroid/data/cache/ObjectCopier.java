@@ -15,7 +15,13 @@ public class ObjectCopier {
 			return false;
 		}
 
-		Field[] srcFields = ReflectionHelper.getAllFields(srcClass);
+		Field[] srcFields;
+		try {
+			srcFields = ReflectionHelper.getAllFields(srcClass);
+			
+		} catch (NoSuchFieldException e1) {
+			return false; //Couldn't get the fields
+		}
 
 		for (Field srcField : srcFields) {
 			try {
@@ -23,7 +29,7 @@ public class ObjectCopier {
 				destField.set(dest, srcField.get(src));
 			}
 			catch (Exception e) {
-
+				//Ignore this field but continue gracefully
 			}
 		}
 

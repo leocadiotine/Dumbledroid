@@ -7,36 +7,36 @@ public class ReflectionHelper {
 
 	public static Field getField(Class<?> fieldClass, String fieldName) throws NoSuchFieldException {
 
-		if (fieldClass == null) {
-			throw new NoSuchFieldException();
-		}
-
 		try {
 			Field field = fieldClass.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return field;
-		} catch (SecurityException e) {
-			System.out.println("SecurityException");
-			return null;
+			
 		} catch (NoSuchFieldException e) {
-			System.out.println("NoSuchFieldException");
-			return getField(fieldClass.getSuperclass(), fieldName);
+			Class<?> superclass = fieldClass.getSuperclass();
+			
+			if (superclass == null) {
+				throw new NoSuchFieldException();
+			}
+			
+			return getField(superclass, fieldName);
 		}
 	}
 
-	public static Field[] getAllFields(Class<?> fieldClass) {
-		
-		if (fieldClass == null) {
-			//TODO This shouldn't be like that.
-			return new Field[0];
-		}
+	public static Field[] getAllFields(Class<?> fieldClass) throws NoSuchFieldException {
 		
 		Field[] fields = fieldClass.getDeclaredFields();
 		for (Field f : fields) {
 			f.setAccessible(true);
 		}
 		
-		return concatArrays(fields, getAllFields(fieldClass.getSuperclass()));
+		Class<?> superclass = fieldClass.getSuperclass();
+		
+		if (superclass == null) {
+			throw new NoSuchFieldException();
+		}
+		
+		return concatArrays(fields, getAllFields(superclass));
 	}
 
 	@SuppressWarnings("unchecked")
