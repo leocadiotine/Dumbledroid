@@ -22,12 +22,11 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 
-
 public class DataController {
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
-
-		HttpResponse httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
+		HttpResponse httpResponse = null;
+		
 		String cacheKey = getKey(receiver, params);
 
 		//Get cached version
@@ -46,18 +45,29 @@ public class DataController {
 			}
 
 			// Check also if it was modified on the server before downloading it
+			try {
+				httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
+			} catch (Exception e) {
+				if(modelHolder != null && ObjectCopier.copy(modelHolder.model, receiver)) {
+					return;
+				}
+				throw e;
+			}
 			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
 			if (lastModHeader != null) {
 				String lastMod = lastModHeader.getValue();
 				long lastModTimeMillis = DateUtils.parseDate(lastMod).getTime();
 
-				if ( modelHolder!= null && lastModTimeMillis <= modelHolder.timestamp ) {
+				if ( modelHolder!= null && lastModTimeMillis <= modelHolder.timestamp && ObjectCopier.copy(modelHolder.model, receiver)) {
 
 					//Discard the connection and return the cached version
-					ObjectCopier.copy(modelHolder.model, receiver);
 					return;
 				}
 			}
+		}
+		
+		if(httpResponse == null) {
+			httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
 		}
 
 		InputStream is = HttpLoader.getHttpContent(httpResponse);
