@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
+import android.net.ParseException;
 
 
 public class DataController {
@@ -49,9 +50,16 @@ public class DataController {
 			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
 			if (lastModHeader != null) {
 				String lastMod = lastModHeader.getValue();
-				long lastModTimeMillis = DateUtils.parseDate(lastMod).getTime();
+				
+				long lastModTimeMillis;
+				
+				try {
+					lastModTimeMillis = DateUtils.parseDate(lastMod).getTime();
+				} catch (ParseException e) {
+					lastModTimeMillis = -1;
+				}
 
-				if ( modelHolder!= null && lastModTimeMillis <= modelHolder.timestamp ) {
+				if ( modelHolder != null && lastModTimeMillis <= modelHolder.timestamp ) {
 
 					//Discard the connection and return the cached version
 					ObjectCopier.copy(modelHolder.model, receiver);
