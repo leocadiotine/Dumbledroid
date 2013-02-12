@@ -28,7 +28,7 @@ public class DataController {
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
 
-		HttpResponse httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
+		HttpResponse httpResponse = null;
 		String cacheKey = getKey(receiver, params);
 
 		//Get cached version
@@ -47,6 +47,7 @@ public class DataController {
 			}
 
 			// Check also if it was modified on the server before downloading it
+			httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
 			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
 			if (lastModHeader != null) {
 				String lastMod = lastModHeader.getValue();
@@ -68,6 +69,9 @@ public class DataController {
 			}
 		}
 
+		if (httpResponse == null) {
+			httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
+		}
 		InputStream is = HttpLoader.getHttpContent(httpResponse);
 
 		switch (dataType) {
