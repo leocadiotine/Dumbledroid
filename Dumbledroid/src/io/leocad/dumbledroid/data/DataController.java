@@ -65,10 +65,9 @@ public class DataController {
 					lastModTimeMillis = -1;
 				}
 
-				if ( modelHolder != null && lastModTimeMillis <= modelHolder.timestamp ) {
+				if ( modelHolder != null && lastModTimeMillis <= modelHolder.timestamp && ObjectCopier.copy(modelHolder.model, receiver)) {
 
 					//Discard the connection and return the cached version
-					ObjectCopier.copy(modelHolder.model, receiver);
 					return;
 				}
 			}
