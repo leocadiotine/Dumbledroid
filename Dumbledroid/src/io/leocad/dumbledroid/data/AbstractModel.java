@@ -1,7 +1,6 @@
 package io.leocad.dumbledroid.data;
 
 import io.leocad.dumbledroid.net.HttpMethod;
-import io.leocad.dumbledroid.net.NoConnectionException;
 
 import java.io.Serializable;
 import java.util.List;
@@ -10,8 +9,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 
 
 public abstract class AbstractModel implements Serializable {
@@ -55,17 +52,6 @@ public abstract class AbstractModel implements Serializable {
 	}
 
 	protected void load(Context ctx, List<NameValuePair> params, HttpMethod method) throws Exception {
-		checkConnection(ctx);
 		DataController.load(ctx, this, getDataType(), params, method);
-	}
-
-	private void checkConnection(Context ctx) throws NoConnectionException {
-
-		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-		
-		if (netInfo == null || !netInfo.isConnectedOrConnecting()) {
-			throw new NoConnectionException();
-		}
 	}
 }

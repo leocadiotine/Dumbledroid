@@ -8,6 +8,7 @@ import io.leocad.dumbledroid.data.xml.Node;
 import io.leocad.dumbledroid.data.xml.SaxParser;
 import io.leocad.dumbledroid.net.HttpLoader;
 import io.leocad.dumbledroid.net.HttpMethod;
+import io.leocad.dumbledroid.net.NoConnectionException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,8 @@ import org.json.JSONException;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.ParseException;
 
 
@@ -28,6 +31,8 @@ public class DataController {
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
 
+		checkConnection(ctx);
+		
 		HttpResponse httpResponse = null;
 		String cacheKey = getKey(receiver, params);
 
@@ -88,6 +93,16 @@ public class DataController {
 		if (receiver.cacheDuration > 0) {
 			MemoryCache.getInstance().cache(cacheKey, receiver);
 			DiskCache.getInstance(ctx).cache(cacheKey, receiver);
+		}
+	}
+	
+	private static void checkConnection(Context ctx) throws NoConnectionException {
+
+		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+		
+		if (netInfo == null || !netInfo.isConnectedOrConnecting()) {
+			throw new NoConnectionException();
 		}
 	}
 
