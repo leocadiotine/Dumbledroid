@@ -1,7 +1,5 @@
 package io.leocad.dumbledroid.data;
 
-import io.leocad.dumbledroid.data.cache.ObjectCopier;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -42,7 +40,7 @@ public class JsonReflector {
 			String name = names.getString(i);
 
 			try {
-				Field field = ObjectCopier.getField(modelClass, name);
+				Field field = ReflectionHelper.getField(modelClass, name);
 
 				if (field.getType() == List.class) {
 					processListField(model, field, jsonObj.getJSONArray(name));
@@ -67,7 +65,7 @@ public class JsonReflector {
 		
 		Class<?> modelClass = model.getClass();
 		try {
-			Field listField = ObjectCopier.getField(modelClass, "list");
+			Field listField = ReflectionHelper.getField(modelClass, "list");
 			
 			processListField(model, listField, jsonArray);
 			

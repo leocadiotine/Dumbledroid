@@ -1,6 +1,5 @@
 package io.leocad.dumbledroid.data;
 
-import io.leocad.dumbledroid.data.cache.ObjectCopier;
 import io.leocad.dumbledroid.data.xml.Node;
 
 import java.lang.reflect.Field;
@@ -19,7 +18,7 @@ public class XmlReflector {
 		Field rootNodeField = null;
 
 		try {
-			rootNodeField = ObjectCopier.getField(modelClass, node.name);
+			rootNodeField = ReflectionHelper.getField(modelClass, node.name);
 
 		} catch (NoSuchFieldException e) {
 		}
@@ -51,7 +50,7 @@ public class XmlReflector {
 
 
 				try {
-					Field field = ObjectCopier.getField(modelClass, key);
+					Field field = ReflectionHelper.getField(modelClass, key);
 
 					Class<?> type = field.getType();
 
@@ -95,7 +94,7 @@ public class XmlReflector {
 	private static void accessFieldAndProcess(Object model, Class<?> modelClass, Node node, Node parentNode) {
 
 		try {
-			Field field = ObjectCopier.getField(modelClass, node.name);
+			Field field = ReflectionHelper.getField(modelClass, node.name);
 
 			if (field.getType() == List.class) {
 				processListField(model, field, node, parentNode);
