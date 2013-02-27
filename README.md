@@ -83,6 +83,9 @@ Dumbledroid source code is released under BSD 2-clause license. Check LICENSE fi
 
 If you use this code, I'd appreciate you refer my name (Leocadio Tiné) and the link to this project's page in your project's website or credits screen. Though you don't have any legal/contractual obligation to do so, just good karma.
 
+##Logo credits
+The logo was created using [Androidify](http://androidify.com/).
+
 ##Suggestions? Comments?
 Pull requests are always welcome. So are donations :)
 
