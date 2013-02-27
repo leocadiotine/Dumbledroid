@@ -8,7 +8,7 @@ Android + web server = magic!
 1.0 (20130227). Download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
 
 ##Purpose
-Dumbledroid is a framework that enables integration between an Android app and a RESTful server using magic. No, kidding.
+Dumbledroid is a framework that enables integration between an Android app and a RESTful server using magic. ~~Actually, it's not real magic. I'm kidding.~~
 
 Using Dumbledroid, the developer doesn't have to write parser for JSON or XML documents from a web service. It maps the document nodes to the class fields and does this automagically!
 
