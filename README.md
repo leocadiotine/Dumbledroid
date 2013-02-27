@@ -37,10 +37,10 @@ For example, if you have a JSON like this:
 
     {
     	"name": "Luke",
-    	"surname":"Skywalker",
-    	"ability":"Force",
-    	"master":"Obi-Wan (Ben) Kenobi",
-    	"father":"Darth Vader"
+    	"surname": "Skywalker",
+    	"ability": "Force",
+    	"master": "Obi-Wan (Ben) Kenobi",
+    	"father": "Darth Vader"
     }
 
 You'll need to write a class like this:
