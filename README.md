@@ -22,6 +22,8 @@ This framework gets the names of the JSON/XML nodes and uses [reflection](http:/
 
 It also adds non-intrusive memory caching using [SoftReferences](http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/ref/SoftReference.html), i.e., when the garbage collector needs the memory, it is freed. The disk cache works by saving the data to the user's SD card.
 
+Furthermore: its connection with the web service is smart. Dumbledroid only opens a connection and checks the headers. If the web service's version wasn't modified since the last time Dumbledroid downloaded it, the framework will use the cached version.
+
 ##Usage
 You can find a whole working example on the `DumbledoreExample` folder of this repository. It's a working Android project that uses the Dumbledore framework. But for the purposes of this manual, following are step by step instructions.
 
