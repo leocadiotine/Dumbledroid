@@ -1,0 +1,6 @@
+# This is just a hack so I can put the empty "res" directory on git.
+
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
