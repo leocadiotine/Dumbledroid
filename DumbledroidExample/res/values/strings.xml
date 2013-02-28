@@ -3,5 +3,6 @@
 
     <string name="app_name">Dumbledroid Example</string>
     <string name="title_activity_jedi">Jedi</string>
+    <string name="title_activity_sith">Sith</string>
 
 </resources>

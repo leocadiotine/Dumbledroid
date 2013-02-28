@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void onSithClicked(View v) {
-		
+		startActivity( new Intent(this, SithActivity.class) );
 	}
 	
 	public void onTwitterClicked(View v) {
