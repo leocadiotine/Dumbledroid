@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:hint="Ex.: android" >
+        android:hint="Ex.: sunset" >
 
         <requestFocus />
     </EditText>

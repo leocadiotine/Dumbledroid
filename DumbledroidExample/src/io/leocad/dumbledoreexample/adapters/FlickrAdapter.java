@@ -3,6 +3,7 @@ package io.leocad.dumbledoreexample.adapters;
 import io.leocad.dumbledoreexample.R;
 import io.leocad.dumbledoreexample.models.FlickrPhotos;
 import io.leocad.dumbledoreexample.models.PhotoItem;
+import io.leocad.dumbledoreexample.util.DrawableManager;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +16,12 @@ public class FlickrAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
 	private FlickrPhotos mPhotos;
+	private DrawableManager mDrawableMgr;
 
 	public FlickrAdapter(Context ctx, FlickrPhotos photos) {
 		mInflater = LayoutInflater.from(ctx);
 		mPhotos = photos;
+		mDrawableMgr = new DrawableManager();
 	}
 	
 	@Override
@@ -61,8 +64,15 @@ public class FlickrAdapter extends BaseAdapter {
 		PhotoItem item = mPhotos.items.get(position);
 		holder.title.setText(item.title);
 		holder.author.setText(item.author);
+		mDrawableMgr.fetchDrawableOnThread(item.media.m, holder.image);
 		
 		return convertView;
+	}
+	
+	@Override
+	public boolean isEnabled(int position) {
+		
+		return false;
 	}
 	
 	static class ViewHolder {
