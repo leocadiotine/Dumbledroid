@@ -85,7 +85,7 @@ public class DrawableManager {
 		}
 		
 		imageView.setImageBitmap(null);
-
+		
 		final Handler handler = new Handler() {
 			@Override
 			public void handleMessage(Message message) {
@@ -96,7 +96,6 @@ public class DrawableManager {
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
-				//TODO : set imageView to a "pending" image
 				Drawable drawable = fetchDrawable(urlString);
 				Message message = handler.obtainMessage(1, drawable);
 				handler.sendMessage(message);
@@ -105,7 +104,7 @@ public class DrawableManager {
 		thread.start();
 	}
 
-	private InputStream fetch(String urlString) throws MalformedURLException, IOException {
+	private static InputStream fetch(String urlString) throws MalformedURLException, IOException {
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		HttpGet request = new HttpGet(urlString);
 		HttpResponse response = httpClient.execute(request);
