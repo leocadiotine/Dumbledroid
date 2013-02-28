@@ -30,7 +30,13 @@ You can find a whole working example on the `DumbledoreExample` folder of this r
 ###Step 1: Add the framework to your Android project
 You can do this in two different ways: importing the Dumbledroid project on Eclipse and [referencing it as a library project](https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject) or simply copying the binary file (.jar) to the `libs` directory of your Android project. You can find the latest binary on the "Current Version" paragraph of this document.
 
-###Step 2: Write your classes
+###Step 2: Add the permissions to your AndroidManifest.xml
+Dumbledroid requires the following permissions to work:
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+###Step 3: Write your classes
 You'll need to write your classes that correspond to your JSON or XML document.
 
 For example, if you have a JSON like this:
@@ -67,7 +73,7 @@ The names of the class fields should be exactly the names of the JSON nodes. The
 
 Feel free to make the fields public or to write getters and setters. Dumbledroid doesn't care about that.
 
-###Step 3: Call Dumbledroid from within your Activity (or Context)
+###Step 4: Call Dumbledroid from within your Activity (or Context)
 After that, you'll just need to do this:
 
     Jedi jedi = new Jedi();
