@@ -44,9 +44,9 @@ For example, if you have a JSON like this:
     {
     	"name": "Luke",
     	"surname": "Skywalker",
-    	"ability": "Force",
-    	"master": "Obi-Wan (Ben) Kenobi",
-    	"father": "Darth Vader"
+    	"age": 18,
+    	"isFromDarkSide": false,
+    	"averageShipSpeed": 138.46
     }
 
 You'll need to write a class like this:
@@ -55,9 +55,9 @@ You'll need to write a class like this:
         
     	private String name;
     	private String surname;
-    	private String ability;
-    	private String master;
-    	private String father;
+    	private int age;
+    	private boolean isFromDarkSide;
+    	private double averageShipSpeed;
     
     	public Jedi() {
     		super("YOUR_JSON_URL");
