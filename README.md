@@ -88,6 +88,8 @@ That's it. Your JSON is already parsed and mapped to the Jedi instance. If you e
 
 *Note: make sure to call `load()` from a background thread, or [your app can crash](https://developer.android.com/training/articles/perf-anr.html).*
 
+##Learn more
+You can find some interesting articles about Dumbledroid usage and code examples at the [Wiki page](https://github.com/leocadiotine/Dumbledroid/wiki/_pages).
 
 ##License
 Dumbledroid source code is released under BSD 2-clause license. Check LICENSE file for more information.
