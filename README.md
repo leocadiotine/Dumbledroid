@@ -10,7 +10,7 @@ Android + webservice = magic!
 ##Purpose
 Dumbledroid is a framework that enables integration between an Android app and a RESTful server using magic. ~~Actually, it's not real magic. I'm kidding.~~
 
-Using Dumbledroid, the developer doesn't have to write parser for JSON or XML documents from a web service. It maps the document nodes to the class fields and does this automagically!
+Using Dumbledroid, the developer doesn't have to write parsers for JSON or XML documents from a web service. It maps the document nodes to the class fields and does this automagically!
 
 Dumbledroid also does automatic caching in memory and in disk. *Presto!*
 
@@ -37,7 +37,7 @@ Dumbledroid requires the following permissions to work:
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-The `WRITE_EXTERNAL_STORAGE` is optional and is needed for the disk cache.
+The `WRITE_EXTERNAL_STORAGE` is optional and is used by the disk cache.
 
 ###Step 3: Write your classes
 You'll need to write your classes that correspond to your JSON or XML document.
@@ -82,7 +82,7 @@ After that, you'll just need to do this:
     Jedi jedi = new Jedi();
     jedi.load();
 
-That's it. Your JSON is already parsed and mapped to the Jedi instance. If you used caching, Dumbledroid already took care of that for you. Simple?
+That's it. Your JSON is already parsed and mapped to the Jedi instance. If you enabled caching, Dumbledroid already took care of that for you. Simple, isn't it?
 
 *Note: make sure to call `load()` from a background thread, or [your app can crash](https://developer.android.com/training/articles/perf-anr.html).*
 
