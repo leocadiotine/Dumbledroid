@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, DumbledroidExampleActivity!</string>
-    <string name="app_name">DumbledroidExample</string>
+    <string name="app_name">Dumbledroid Example</string>
 
 </resources>
