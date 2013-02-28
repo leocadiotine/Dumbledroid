@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Sith extends AbstractModel {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7828325552043546133L;
 	
 	private String side;
 	private List<String> names;
@@ -65,9 +65,5 @@ public class Sith extends AbstractModel {
 
 	public void setKills(int kills) {
 		this.kills = kills;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 }

@@ -1,7 +1,11 @@
 package io.leocad.dumbledoreexample.models;
 
-public class Suit {
+import java.io.Serializable;
 
+public class Suit implements Serializable {
+
+	private static final long serialVersionUID = 3422767378715300945L;
+	
 	private String color;
 	private boolean cloak;
 	
