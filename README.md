@@ -35,6 +35,9 @@ Dumbledroid requires the following permissions to work:
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+The `WRITE_EXTERNAL_STORAGE` is optional and is needed for the disk cache.
 
 ###Step 3: Write your classes
 You'll need to write your classes that correspond to your JSON or XML document.
