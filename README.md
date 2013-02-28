@@ -4,6 +4,8 @@
 
 Android + webservice = magic!
 
+Download the [example app on Google Play](https://play.google.com/store/apps/details?id=io.leocad.dumbledroidexample) to see it in action!
+
 ##Current version
 1.0 (20130227). Download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
 
