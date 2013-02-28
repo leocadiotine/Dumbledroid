@@ -3,10 +3,13 @@ package io.leocad.dumbledoreexample.activities;
 import io.leocad.dumbledoreexample.R;
 import io.leocad.dumbledoreexample.models.Sith;
 import io.leocad.dumbledoreexample.models.Suit;
+import io.leocad.dumbledroid.net.NoConnectionException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +50,10 @@ public class SithActivity extends Activity {
 					Sith sith = new Sith();
 					sith.load(SithActivity.this);
 					return sith;
+					
+				} catch (NoConnectionException e) {
+					onConnectionError();
+					return null;
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -57,7 +64,9 @@ public class SithActivity extends Activity {
 			@Override
 			protected void onPostExecute(Sith sith) {
 
-				printContent(sith);
+				if (sith != null) {
+					printContent(sith);
+				}
 				mDialog.dismiss();
 			}
 		}.execute();
@@ -70,6 +79,29 @@ public class SithActivity extends Activity {
 		((TextView) findViewById(R.id.tv_suit_color)).setText( suit.getColor() );
 		((TextView) findViewById(R.id.tv_suit_cloak)).setText( String.valueOf(suit.hasCloak()) );
 		((TextView) findViewById(R.id.tv_kills)).setText( String.valueOf(sith.getKills()) );
+	}
+	
+	private void onConnectionError() {
+		
+		runOnUiThread( new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				new AlertDialog.Builder(SithActivity.this)
+				.setTitle("Error")
+				.setMessage("Data connection unavailable!")
+				.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.create()
+				.show();
+			}
+		});
 	}
 	
 	@Override

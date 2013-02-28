@@ -2,10 +2,13 @@ package io.leocad.dumbledoreexample.activities;
 
 import io.leocad.dumbledoreexample.R;
 import io.leocad.dumbledoreexample.models.Jedi;
+import io.leocad.dumbledroid.net.NoConnectionException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +50,10 @@ public class JediActivity extends Activity {
 					jedi.load(JediActivity.this);
 					return jedi;
 
+				} catch (NoConnectionException e) {
+					onConnectionError();
+					return null;
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					return null;
@@ -56,7 +63,9 @@ public class JediActivity extends Activity {
 			@Override
 			protected void onPostExecute(Jedi jedi) {
 
-				printContent(jedi);
+				if (jedi != null) {
+					printContent(jedi);
+				}
 				mDialog.dismiss();
 			}
 		}.execute();
@@ -68,6 +77,29 @@ public class JediActivity extends Activity {
 		((TextView) findViewById(R.id.tv_ability)).setText( jedi.ability );
 		((TextView) findViewById(R.id.tv_master)).setText( jedi.master );
 		((TextView) findViewById(R.id.tv_father)).setText( jedi.father );
+	}
+	
+	private void onConnectionError() {
+		
+		runOnUiThread( new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				new AlertDialog.Builder(JediActivity.this)
+				.setTitle("Error")
+				.setMessage("Data connection unavailable!")
+				.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.create()
+				.show();
+			}
+		});
 	}
 	
 	@Override
