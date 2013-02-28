@@ -23,6 +23,6 @@ public class MainActivity extends Activity {
 	}
 	
 	public void onTwitterClicked(View v) {
-		
+		startActivity( new Intent(this, FlickrActivity.class) );
 	}
 }
