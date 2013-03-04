@@ -5,5 +5,6 @@
     <string name="title_activity_jedi">Jedi</string>
     <string name="title_activity_sith">Sith</string>
     <string name="title_activity_flickr">Flickr search</string>
+    <string name="title_activity_about">About</string>
 
 </resources>

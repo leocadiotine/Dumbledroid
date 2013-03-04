@@ -1,45 +1,36 @@
 package io.leocad.dumbledoreexample.activities;
 
 import io.leocad.dumbledoreexample.R;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 
-public abstract class BaseActivity extends Activity {
+public class AboutActivity extends Activity {
 
-	protected void onConnectionError() {
-
-		runOnUiThread( new Runnable() {
-
-			@Override
-			public void run() {
-
-				new AlertDialog.Builder(BaseActivity.this)
-				.setTitle("Error")
-				.setMessage("Data connection unavailable!")
-				.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				})
-				.create()
-				.show();
-			}
-		});
-	}
-	
+	@SuppressLint("NewApi")
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-	    getMenuInflater().inflate(R.menu.menu, menu);
-	    return true;
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.about);
+		
+		if (Build.VERSION.SDK_INT >= 11) {
+			// Show the Up button in the action bar.
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+		
+		loadContent();
 	}
 	
+	private void loadContent() {
+		
+		WebView wv = (WebView) findViewById(R.id.wv);
+		wv.loadUrl("file:///android_asset/about.html");
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -55,7 +46,7 @@ public abstract class BaseActivity extends Activity {
 			return true;
 			
 		case R.id.menu_about:
-			startActivity( new Intent(this, AboutActivity.class) );
+			//startActivity( new intent)
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
