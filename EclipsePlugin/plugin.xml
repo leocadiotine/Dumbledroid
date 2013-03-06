@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Multi-page Editor"
+            extensions="mpe"
+            icon="icons/sample.gif"
+            contributorClass="io.leocad.dumbledroidplugin.editors.MultiPageEditorContributor"
+            class="io.leocad.dumbledroidplugin.editors.MultiPageEditor"
+            id="io.leocad.dumbledroidplugin.editors.MultiPageEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="Dumbledroid"
+            id="io.leocad.dumbledroidplugin">
+      </category>
+      <wizard
+            name="Dumbledroid Model file"
+            icon="icons/sample.gif"
+            category="io.leocad.dumbledroidplugin"
+            class="io.leocad.dumbledroidplugin.wizards.NewModelWizard"
+            id="io.leocad.dumbledroidplugin.wizards.NewModelWizard">
+      </wizard>
+   </extension>
+
+</plugin>
