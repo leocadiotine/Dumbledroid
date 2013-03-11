@@ -20,31 +20,40 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 public class NewModelWizard extends Wizard implements INewWizard {
 
-	private UrlInputPage page;
-	private ISelection selection;
+	private ISelection mSelection;
 
 	public NewModelWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}
-
-	public void addPages() {
-		page = new UrlInputPage(selection);
-		addPage(page);
+	
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		mSelection = selection;
 	}
 
+	@Override
+	public void addPages() {
+		UrlInputPage page = new UrlInputPage(mSelection);
+		addPage(page);
+	}
+	
 	/**
 	 * This method is called when 'Finish' button is pressed in the wizard. We
 	 * will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
+		
+		UrlInputPage page = (UrlInputPage) getPage(UrlInputPage.PAGE_NAME);
+		System.out.println(page.getUrl());
+		System.out.println(page.getIsPojo());
+		
 //		final String containerName = page.getContainerName();
 //		final String fileName = page.getFileName();
 //		IRunnableWithProgress op = new IRunnableWithProgress() {
@@ -122,13 +131,4 @@ public class NewModelWizard extends Wizard implements INewWizard {
 		throw new CoreException(status);
 	}
 
-	/**
-	 * We will accept the selection in the workbench to see if we can initialize
-	 * from it.
-	 * 
-	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
-	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.selection = selection;
-	}
 }
