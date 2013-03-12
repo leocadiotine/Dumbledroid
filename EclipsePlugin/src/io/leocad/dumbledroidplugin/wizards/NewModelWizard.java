@@ -34,7 +34,7 @@ public class NewModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		UrlInputPage page = new UrlInputPage(mSelection);
+		DataInputPage page = new DataInputPage(mSelection);
 		addPage(page);
 	}
 	
@@ -44,7 +44,7 @@ public class NewModelWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		
-		UrlInputPage page = (UrlInputPage) getPage(UrlInputPage.PAGE_NAME);
+		DataInputPage page = (DataInputPage) getPage(DataInputPage.PAGE_NAME);
 		final String url = page.getUrl();
 		final boolean isPojo = page.getIsPojo();
 		
