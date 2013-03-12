@@ -47,13 +47,15 @@ public class NewModelWizard extends Wizard implements INewWizard {
 		DataInputPage page = (DataInputPage) getPage(DataInputPage.PAGE_NAME);
 		final String url = page.getUrl();
 		final boolean isPojo = page.getIsPojo();
+		final String className = page.getClassName();
 		
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				
 				try {
-					DumbledroidClassCreator.create(url, isPojo, monitor);
+					DumbledroidClassCreator.create(url, isPojo, className,  monitor);
+					
 				} catch (Exception e) {
 					throw new InvocationTargetException(e);
 				} finally {
