@@ -11,13 +11,14 @@ import java.net.HttpURLConnection;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonHandler {
 
-	public static void parseJsonToFiles(HttpURLConnection connection, boolean isPojo, IFile file) throws InvalidUrlException, InvalidContentException {
+	public static void parseJsonToFiles(HttpURLConnection connection, boolean isPojo, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
 		
 		String jsonString = getJsonString(connection);
 		
@@ -39,9 +40,9 @@ public class JsonHandler {
 		}
 		
 		if (jsonObj != null) {
-			processObjectFileMap(jsonObj, isPojo, file);
+			processObjectFileMap(jsonObj, isPojo, file, monitor);
 		} else {
-			processArrayFileMap(jsonArray, isPojo, file);
+			processArrayFileMap(jsonArray, isPojo, file, monitor);
 		}
 	}
 
@@ -65,7 +66,7 @@ public class JsonHandler {
 		}
 	}
 	
-	private static void processObjectFileMap(JSONObject jsonObj, boolean isPojo, IFile file) {
+	private static void processObjectFileMap(JSONObject jsonObj, boolean isPojo, IFile file, IProgressMonitor monitor) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
@@ -120,10 +121,14 @@ public class JsonHandler {
 		.append(settersBuffer)
 		.append("\n}");
 		
-		System.out.println(fileBuffer.toString());
+		monitor.worked(1);
+		monitor.setTaskName("Writing file(s)…");
+		
+		FileUtils.write(file, fileBuffer.toString(), monitor);
+		monitor.worked(1);
 	}
 	
-	private static void processArrayFileMap(JSONArray jsonArray, boolean isPojo, IFile file) {
+	private static void processArrayFileMap(JSONArray jsonArray, boolean isPojo, IFile file, IProgressMonitor monitor) {
 		
 	}
 }

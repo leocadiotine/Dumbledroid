@@ -11,10 +11,6 @@ public class FileCreationPage extends WizardNewFileCreationPage {
 		super(PAGE_NAME, selection);
 		setTitle("Dumbledroid Model Creator");
 		setDescription("This wizard creates a new Java class from a JSON/XML to use with the Dumbledroid framework.");
-	}
-
-	@Override
-	public String getFileExtension() {
-		return "java";
+		setFileExtension("java");
 	}
 }

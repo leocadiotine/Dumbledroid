@@ -26,13 +26,11 @@ public class DumbledroidClassCreator {
 		monitor.setTaskName("Fetching and parsing URL contents…");
 
 		if (isJson) {
-			JsonHandler.parseJsonToFiles(connection, isPojo, file);
+			JsonHandler.parseJsonToFiles(connection, isPojo, file, monitor);
 		} else {
-			XmlHandler.parseXmlToFiles(connection, isPojo, file);
+			XmlHandler.parseXmlToFiles(connection, isPojo, file, monitor);
 		}
 
-		monitor.worked(1);
-		monitor.setTaskName("Writing file(s)…");
 		// IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		// IResource resource = root.findMember(new Path(containerName));
 		// if (!resource.exists() || !(resource instanceof IContainer)) {
