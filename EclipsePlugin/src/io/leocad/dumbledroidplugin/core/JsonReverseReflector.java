@@ -40,9 +40,9 @@ public class JsonReverseReflector {
 		}
 		
 		if (jsonObj != null) {
-			processObjectFileMap(jsonObj, url, isPojo, cacheDuration, file, monitor);
+			processJsonObjectFile(jsonObj, url, isPojo, cacheDuration, file, monitor);
 		} else {
-			processArrayFileMap(jsonArray, url, isPojo, cacheDuration, file, monitor);
+			processJsonArrayFile(jsonArray, url, isPojo, cacheDuration, file, monitor);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class JsonReverseReflector {
 		}
 	}
 	
-	private static void processObjectFileMap(JSONObject jsonObj, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
+	private static void processJsonObjectFile(JSONObject jsonObj, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
@@ -106,7 +106,7 @@ public class JsonReverseReflector {
 		FileUtils.write(file, fileBuffer.toString(), monitor);
 	}
 	
-	private static void processArrayFileMap(JSONArray jsonArray, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
+	private static void processJsonArrayFile(JSONArray jsonArray, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
 		
 	}
 }
