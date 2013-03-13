@@ -30,7 +30,7 @@ public class FileUtils {
 		ByteArrayInputStream is = new ByteArrayInputStream(string.getBytes());
 		
 		try {
-			file.setContents(is, IFile.FORCE, monitor);
+			file.setContents(is, false, false, monitor);
 		} catch (CoreException e) {
 			
 			e.printStackTrace();
