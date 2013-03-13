@@ -29,12 +29,12 @@ public class ClassWriter {
 		.append(" {\n");
 	}
 	
-	public static void appendFieldDeclaration(StringBuffer fileBuffer, String fieldName, String fieldClassName, boolean isPojo, StringBuffer gettersBuffer, StringBuffer settersBuffer) {
+	public static void appendFieldDeclaration(StringBuffer fileBuffer, String fieldName, String fieldTypeName, boolean isPojo, StringBuffer gettersBuffer, StringBuffer settersBuffer) {
 		
 		fileBuffer.append("\n    ")
 		.append(isPojo? "public " : "private ")
 		
-		.append(fieldClassName)
+		.append(fieldTypeName)
 		.append(" ").append(fieldName).append(";");
 		
 		// Buffer the accessor methods for posterior writing
@@ -43,14 +43,14 @@ public class ClassWriter {
 			String fieldCamelCase = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
 			
 			gettersBuffer.append("\n    public ")
-			.append(fieldClassName)
+			.append(fieldTypeName)
 			.append(" get").append(fieldCamelCase)
 			.append("() {\n        return this.").append(fieldName).append(";\n    }\n");
 			
 			settersBuffer.append("\n    public void set")
 			.append(fieldCamelCase)
 			.append("(")
-			.append(fieldClassName)
+			.append(fieldTypeName)
 			.append(" ")
 			.append(fieldName)
 			.append(") {\n        this.")

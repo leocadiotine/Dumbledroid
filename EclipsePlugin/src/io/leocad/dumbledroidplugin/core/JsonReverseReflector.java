@@ -83,10 +83,15 @@ public class JsonReverseReflector {
 			
 			String key = keys.next();
 			Object object = jsonObj.get(key);
-			// TODO Handle JSONObject & JSONArray
-			final String fieldClassName = object.getClass().getSimpleName();
+			String fieldTypeName = ClassMapper.getPrimitiveTypeName(object);
 			
-			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldClassName, isPojo, gettersBuffer, settersBuffer);
+			if (fieldTypeName == null) {
+				// Not a primitive. Recursion ahead.
+				// TODO Handle JSONObject & JSONArray
+				fieldTypeName = object.getClass().getSimpleName();
+			}
+			
+			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
 		}
 		fileBuffer.append("\n");
 		
