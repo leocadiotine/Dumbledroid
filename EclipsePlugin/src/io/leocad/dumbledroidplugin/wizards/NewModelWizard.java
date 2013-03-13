@@ -17,6 +17,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 public class NewModelWizard extends Wizard implements INewWizard {
 
@@ -56,6 +60,19 @@ public class NewModelWizard extends Wizard implements INewWizard {
 				
 				try {
 					DumbledroidClassCreator.create(url, isPojo, newFile, monitor);
+					
+					monitor.worked(1);
+					monitor.setTaskName("Opening file…");
+
+					getShell().getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+							try {
+								IDE.openEditor(page, newFile, true);
+							} catch (PartInitException e) {
+							}
+						}
+					});
 					
 				} catch (Exception e) {
 					throw new InvocationTargetException(e);

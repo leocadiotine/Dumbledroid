@@ -125,7 +125,6 @@ public class JsonHandler {
 		monitor.setTaskName("Writing file(s)…");
 		
 		FileUtils.write(file, fileBuffer.toString(), monitor);
-		monitor.worked(1);
 	}
 	
 	private static void processArrayFileMap(JSONArray jsonArray, boolean isPojo, IFile file, IProgressMonitor monitor) {

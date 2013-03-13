@@ -16,7 +16,7 @@ public class DumbledroidClassCreator {
 
 	public static void create(String urlAddress, boolean isPojo, IFile file, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
 
-		monitor.beginTask("Validating URL…", 3);
+		monitor.beginTask("Validating URL…", 4);
 
 		HttpURLConnection connection = validateAndOpenConnection(urlAddress);
 
@@ -49,17 +49,7 @@ public class DumbledroidClassCreator {
 		// stream.close();
 		// } catch (IOException e) {
 		// }
-
-		// getShell().getDisplay().asyncExec(new Runnable() {
-		// public void run() {
-		// IWorkbenchPage page =
-		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		// try {
-		// IDE.openEditor(page, file, true);
-		// } catch (PartInitException e) {
-		// }
-		// }
-		// });
+		
 		monitor.worked(1);
 	}
 
