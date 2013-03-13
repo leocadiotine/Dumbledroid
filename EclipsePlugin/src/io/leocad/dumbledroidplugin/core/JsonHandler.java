@@ -76,7 +76,7 @@ public class JsonHandler {
 		.append(FileUtils.getPackageName(file))
 		.append(";\n\n")
 		
-		.append("public class ").append(file.getName()).append(" {\n");
+		.append("public class ").append(FileUtils.getFileNameWithoutExtension(file)).append(" {\n");
 		
 		@SuppressWarnings("unchecked")
 		Iterator<String> keys = jsonObj.keys();
