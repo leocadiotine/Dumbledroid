@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 public class JsonHandler {
 
-	public static void parseJsonToFiles(HttpURLConnection connection, boolean isPojo, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
+	public static void parseJsonToFiles(HttpURLConnection connection, String url, boolean isPojo, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
 		
 		String jsonString = getJsonString(connection);
 		
@@ -40,9 +40,9 @@ public class JsonHandler {
 		}
 		
 		if (jsonObj != null) {
-			processObjectFileMap(jsonObj, isPojo, file, monitor);
+			processObjectFileMap(jsonObj, url, isPojo, file, monitor);
 		} else {
-			processArrayFileMap(jsonArray, isPojo, file, monitor);
+			processArrayFileMap(jsonArray, url, isPojo, file, monitor);
 		}
 	}
 
@@ -66,18 +66,28 @@ public class JsonHandler {
 		}
 	}
 	
-	private static void processObjectFileMap(JSONObject jsonObj, boolean isPojo, IFile file, IProgressMonitor monitor) {
+	private static void processObjectFileMap(JSONObject jsonObj, String url, boolean isPojo, IFile file, IProgressMonitor monitor) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
 		StringBuffer settersBuffer = new StringBuffer();
 		
+		// Package declaration
 		fileBuffer.append("package ")
 		.append(FileUtils.getPackageName(file))
 		.append(";\n\n")
 		
-		.append("public class ").append(FileUtils.getFileNameWithoutExtension(file)).append(" {\n");
+		// Import statements
+		.append("import io.leocad.dumbledroid.data.AbstractModel;\n")
+		.append("import io.leocad.dumbledroid.data.DataType;\n\n");
 		
+		// Class declaration
+		final String className = FileUtils.getFileNameWithoutExtension(file);
+		fileBuffer.append("public class ")
+		.append(className)
+		.append(" extends AbstractModel {\n");
+		
+		// Fields declaration
 		@SuppressWarnings("unchecked")
 		Iterator<String> keys = jsonObj.keys();
 		while (keys.hasNext()) {
@@ -115,11 +125,25 @@ public class JsonHandler {
 				.append(";\n    }\n");
 			}
 		}
-		
 		fileBuffer.append("\n")
+		
+		// Constructor
+		// TODO Support cache
+		.append("\n    public ")
+		.append(className)
+		.append("() {\n        super(\"")
+		.append(url)
+		.append("\");\n    }\n")
+
+		// Accessor methods
 		.append(gettersBuffer)
 		.append(settersBuffer)
-		.append("\n}");
+		
+		// Inherited abstract methods
+		.append("\n    @Override\n    protected DataType getDataType() {\n        return DataType.JSON;\n    }\n")
+		
+		// Class end
+		.append("}");
 		
 		monitor.worked(1);
 		monitor.setTaskName("Writing file(s)…");
@@ -127,7 +151,7 @@ public class JsonHandler {
 		FileUtils.write(file, fileBuffer.toString(), monitor);
 	}
 	
-	private static void processArrayFileMap(JSONArray jsonArray, boolean isPojo, IFile file, IProgressMonitor monitor) {
+	private static void processArrayFileMap(JSONArray jsonArray, String url, boolean isPojo, IFile file, IProgressMonitor monitor) {
 		
 	}
 }

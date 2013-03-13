@@ -26,9 +26,9 @@ public class DumbledroidClassCreator {
 		monitor.setTaskName("Fetching and parsing URL contents…");
 
 		if (isJson) {
-			JsonHandler.parseJsonToFiles(connection, isPojo, file, monitor);
+			JsonHandler.parseJsonToFiles(connection, urlAddress, isPojo, file, monitor);
 		} else {
-			XmlHandler.parseXmlToFiles(connection, isPojo, file, monitor);
+			XmlHandler.parseXmlToFiles(connection, urlAddress, isPojo, file, monitor);
 		}
 
 		// IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
