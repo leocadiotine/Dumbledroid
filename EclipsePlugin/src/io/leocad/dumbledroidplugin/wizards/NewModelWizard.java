@@ -50,6 +50,7 @@ public class NewModelWizard extends Wizard implements INewWizard {
 		DataInputPage dataPage = (DataInputPage) getPage(DataInputPage.PAGE_NAME);
 		final String url = dataPage.getUrl();
 		final boolean isPojo = dataPage.getIsPojo();
+		final long cacheDuration = dataPage.getCacheDuration();
 		
 		FileCreationPage filePage = (FileCreationPage) getPage(FileCreationPage.PAGE_NAME);
 		final IFile newFile = filePage.createNewFile();
@@ -59,7 +60,7 @@ public class NewModelWizard extends Wizard implements INewWizard {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				
 				try {
-					DumbledroidClassCreator.create(url, isPojo, newFile, monitor);
+					DumbledroidClassCreator.create(url, isPojo, cacheDuration, newFile, monitor);
 					
 					monitor.worked(1);
 					monitor.setTaskName("Opening file…");

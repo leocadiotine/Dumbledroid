@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 public class DumbledroidClassCreator {
 
-	public static void create(String urlAddress, boolean isPojo, IFile file, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
+	public static void create(String urlAddress, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
 
 		monitor.beginTask("Validating URL…", 4);
 
@@ -26,9 +26,9 @@ public class DumbledroidClassCreator {
 		monitor.setTaskName("Fetching and parsing URL contents…");
 
 		if (isJson) {
-			JsonHandler.parseJsonToFiles(connection, urlAddress, isPojo, file, monitor);
+			JsonHandler.parseJsonToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
 		} else {
-			XmlHandler.parseXmlToFiles(connection, urlAddress, isPojo, file, monitor);
+			XmlHandler.parseXmlToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
 		}
 		
 		monitor.worked(1);

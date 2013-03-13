@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 public class JsonHandler {
 
-	public static void parseJsonToFiles(HttpURLConnection connection, String url, boolean isPojo, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
+	public static void parseJsonToFiles(HttpURLConnection connection, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
 		
 		String jsonString = getJsonString(connection);
 		
@@ -40,9 +40,9 @@ public class JsonHandler {
 		}
 		
 		if (jsonObj != null) {
-			processObjectFileMap(jsonObj, url, isPojo, file, monitor);
+			processObjectFileMap(jsonObj, url, isPojo, cacheDuration, file, monitor);
 		} else {
-			processArrayFileMap(jsonArray, url, isPojo, file, monitor);
+			processArrayFileMap(jsonArray, url, isPojo, cacheDuration, file, monitor);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class JsonHandler {
 		}
 	}
 	
-	private static void processObjectFileMap(JSONObject jsonObj, String url, boolean isPojo, IFile file, IProgressMonitor monitor) {
+	private static void processObjectFileMap(JSONObject jsonObj, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
@@ -128,12 +128,18 @@ public class JsonHandler {
 		fileBuffer.append("\n")
 		
 		// Constructor
-		// TODO Support cache
 		.append("\n    public ")
 		.append(className)
 		.append("() {\n        super(\"")
 		.append(url)
-		.append("\");\n    }\n")
+		.append("\"");
+		
+		if (cacheDuration > 0) {
+			fileBuffer.append(", ")
+			.append(cacheDuration);
+		}
+	
+		fileBuffer.append(");\n    }\n")
 
 		// Accessor methods
 		.append(gettersBuffer)
@@ -151,7 +157,7 @@ public class JsonHandler {
 		FileUtils.write(file, fileBuffer.toString(), monitor);
 	}
 	
-	private static void processArrayFileMap(JSONArray jsonArray, String url, boolean isPojo, IFile file, IProgressMonitor monitor) {
+	private static void processArrayFileMap(JSONArray jsonArray, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
 		
 	}
 }

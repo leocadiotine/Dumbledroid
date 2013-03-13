@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 public class XmlHandler {
 
-	public static Map<String, String> parseXmlToFiles(HttpURLConnection connection, String urlAddress, boolean isPojo, IFile file, IProgressMonitor monitor) throws InvalidUrlException {
+	public static Map<String, String> parseXmlToFiles(HttpURLConnection connection, String urlAddress, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws InvalidUrlException {
 		
 		return null;
 	}
