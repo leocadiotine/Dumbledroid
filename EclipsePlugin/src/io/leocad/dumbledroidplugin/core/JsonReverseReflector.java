@@ -72,20 +72,9 @@ public class JsonReverseReflector {
 		StringBuffer gettersBuffer = new StringBuffer();
 		StringBuffer settersBuffer = new StringBuffer();
 		
-		// Package declaration
-		fileBuffer.append("package ")
-		.append(FileUtils.getPackageName(file))
-		.append(";\n\n")
-		
-		// Import statements
-		.append("import io.leocad.dumbledroid.data.AbstractModel;\n")
-		.append("import io.leocad.dumbledroid.data.DataType;\n\n");
-		
-		// Class declaration
-		final String className = FileUtils.getFileNameWithoutExtension(file);
-		fileBuffer.append("public class ")
-		.append(className)
-		.append(" extends AbstractModel {\n");
+		ClassWriter.appendPackageDeclaration(fileBuffer, file);
+		ClassWriter.appendImportStatements(fileBuffer, true);
+		ClassWriter.appendClassDeclaration(fileBuffer, file, true);
 		
 		// Fields declaration
 		@SuppressWarnings("unchecked")
@@ -94,62 +83,17 @@ public class JsonReverseReflector {
 			
 			String key = keys.next();
 			Object object = jsonObj.get(key);
-			
-			fileBuffer.append("\n    ")
-			.append(isPojo? "public " : "private ")
-			
 			// TODO Handle JSONObject & JSONArray
-			.append(object.getClass().getSimpleName())
-			.append(" ").append(key).append(";");
+			final String fieldClassName = object.getClass().getSimpleName();
 			
-			// Buffer the accessor methods for posterior writing
-			if (!isPojo) {
-				
-				String keyCamelCase = Character.toUpperCase(key.charAt(0)) + key.substring(1);
-				
-				gettersBuffer.append("\n    public ")
-				.append(object.getClass().getSimpleName())
-				.append(" get").append(keyCamelCase)
-				.append("() {\n        return this.").append(key).append(";\n    }\n");
-				
-				settersBuffer.append("\n    public void set")
-				.append(keyCamelCase)
-				.append("(")
-				.append(object.getClass().getSimpleName())
-				.append(" ")
-				.append(key)
-				.append(") {\n        this.")
-				.append(key)
-				.append(" = ")
-				.append(key)
-				.append(";\n    }\n");
-			}
+			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldClassName, isPojo, gettersBuffer, settersBuffer);
 		}
-		fileBuffer.append("\n")
+		fileBuffer.append("\n");
 		
-		// Constructor
-		.append("\n    public ")
-		.append(className)
-		.append("() {\n        super(\"")
-		.append(url)
-		.append("\"");
-		
-		if (cacheDuration > 0) {
-			fileBuffer.append(", ")
-			.append(cacheDuration);
-		}
-	
-		fileBuffer.append(");\n    }\n")
-
-		// Accessor methods
-		.append(gettersBuffer)
-		.append(settersBuffer)
-		
-		// Inherited abstract methods
-		.append("\n    @Override\n    protected DataType getDataType() {\n        return DataType.JSON;\n    }\n")
-		
-		// Class end
-		.append("}");
+		ClassWriter.appendConstructor(fileBuffer, file, url, cacheDuration);
+		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
+		ClassWriter.appendInheritAbstractMethods(fileBuffer, true);
+		ClassWriter.appendClassEnd(fileBuffer);
 		
 		monitor.worked(1);
 		monitor.setTaskName("Writing file(s)…");
