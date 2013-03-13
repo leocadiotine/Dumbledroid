@@ -30,25 +30,6 @@ public class DumbledroidClassCreator {
 		} else {
 			XmlHandler.parseXmlToFiles(connection, urlAddress, isPojo, file, monitor);
 		}
-
-		// IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		// IResource resource = root.findMember(new Path(containerName));
-		// if (!resource.exists() || !(resource instanceof IContainer)) {
-		// throwCoreException("Container \"" + containerName
-		// + "\" does not exist.");
-		// }
-		// IContainer container = (IContainer) resource;
-		// final IFile file = container.getFile(new Path(fileName));
-		// try {
-		// InputStream stream = openContentStream();
-		// if (file.exists()) {
-		// file.setContents(stream, true, true, monitor);
-		// } else {
-		// file.create(stream, true, monitor);
-		// }
-		// stream.close();
-		// } catch (IOException e) {
-		// }
 		
 		monitor.worked(1);
 	}
