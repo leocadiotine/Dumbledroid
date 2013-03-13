@@ -16,19 +16,19 @@ public class DumbledroidClassCreator {
 
 	public static void create(String urlAddress, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
 
-		monitor.beginTask("Validating URL…", 4);
+		monitor.beginTask("Validating URL…", 2);
 
 		HttpURLConnection connection = validateAndOpenConnection(urlAddress);
 
 		boolean isJson = isJson(connection);
 		monitor.worked(1);
 
-		monitor.setTaskName("Fetching and parsing URL contents…");
+		monitor.setTaskName("Writing files…");
 
 		if (isJson) {
-			JsonReverseReflector.parseJsonToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
+			JsonReverseReflector.parseJsonToFiles(connection, urlAddress, isPojo, cacheDuration, file);
 		} else {
-			XmlReverseReflector.parseXmlToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
+			XmlReverseReflector.parseXmlToFiles(connection, urlAddress, isPojo, cacheDuration, file);
 		}
 		
 		monitor.worked(1);

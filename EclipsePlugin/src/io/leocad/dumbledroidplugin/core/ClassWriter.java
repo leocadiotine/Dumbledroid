@@ -40,7 +40,7 @@ public class ClassWriter {
 		// Buffer the accessor methods for posterior writing
 		if (!isPojo) {
 			
-			String fieldCamelCase = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+			String fieldCamelCase = uppercaseFirstChar(fieldName);
 			
 			gettersBuffer.append("\n    public ")
 			.append(fieldTypeName)
@@ -61,20 +61,22 @@ public class ClassWriter {
 		}
 	}
 
-	public static void appendConstructor(StringBuffer fileBuffer, IFile file, String url, long cacheDuration) {
+	public static void appendConstructor(StringBuffer fileBuffer, IFile file, String url, long cacheDuration, boolean isAbstractModel) {
 		
-		fileBuffer.append("\n    public ")
-		.append(FileUtils.getFileNameWithoutExtension(file))
-		.append("() {\n        super(\"")
-		.append(url)
-		.append("\"");
-
-		if (cacheDuration > 0) {
-			fileBuffer.append(", ")
-			.append(cacheDuration);
+		if (isAbstractModel) {
+			fileBuffer.append("\n    public ")
+			.append(FileUtils.getFileNameWithoutExtension(file))
+			.append("() {\n        super(\"")
+			.append(url)
+			.append("\"");
+	
+			if (cacheDuration > 0) {
+				fileBuffer.append(", ")
+				.append(cacheDuration);
+			}
+	
+			fileBuffer.append(");\n    }\n");
 		}
-
-		fileBuffer.append(");\n    }\n");
 	}
 
 	public static void appendAccessorMethods(StringBuffer fileBuffer, StringBuffer gettersBuffer, StringBuffer settersBuffer) {
@@ -83,16 +85,23 @@ public class ClassWriter {
 		.append(settersBuffer);
 	}
 
-	public static void appendInheritAbstractMethods(StringBuffer fileBuffer, boolean isJson) {
+	public static void appendInheritAbstractMethods(StringBuffer fileBuffer, boolean isJson, boolean isAbstractModel) {
 
-		fileBuffer.append("\n    @Override\n    protected DataType getDataType() {\n        return DataType.")
-		.append(isJson? "JSON": "XML")
-		.append(";\n    }\n");
+		if (isAbstractModel) {
+			fileBuffer.append("\n    @Override\n    protected DataType getDataType() {\n        return DataType.")
+			.append(isJson? "JSON": "XML")
+			.append(";\n    }\n");
+		}
 	}
 
 	public static void appendClassEnd(StringBuffer fileBuffer) {
 		
 		fileBuffer.append("}");
+	}
+	
+	public static String uppercaseFirstChar(String fieldName) {
+		
+		return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
 	}
 
 }

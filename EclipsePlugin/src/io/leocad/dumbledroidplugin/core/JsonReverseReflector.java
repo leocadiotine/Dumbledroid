@@ -11,14 +11,14 @@ import java.net.HttpURLConnection;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonReverseReflector {
 
-	public static void parseJsonToFiles(HttpURLConnection connection, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
+	public static void parseJsonToFiles(HttpURLConnection connection, String url, boolean isPojo, long cacheDuration, IFile file) throws InvalidUrlException, InvalidContentException {
 		
 		String jsonString = getJsonString(connection);
 		
@@ -40,9 +40,9 @@ public class JsonReverseReflector {
 		}
 		
 		if (jsonObj != null) {
-			processJsonObjectFile(jsonObj, url, isPojo, cacheDuration, file, monitor);
+			processJsonObjectFile(jsonObj, true, url, isPojo, cacheDuration, file);
 		} else {
-			processJsonArrayFile(jsonArray, url, isPojo, cacheDuration, file, monitor);
+			processJsonArrayFile(jsonArray, true, url, isPojo, cacheDuration, file);
 		}
 	}
 
@@ -66,15 +66,15 @@ public class JsonReverseReflector {
 		}
 	}
 	
-	private static void processJsonObjectFile(JSONObject jsonObj, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
+	private static void processJsonObjectFile(JSONObject jsonObj, boolean isAbstractModel, String url, boolean isPojo, long cacheDuration, IFile file) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
 		StringBuffer settersBuffer = new StringBuffer();
 		
 		ClassWriter.appendPackageDeclaration(fileBuffer, file);
-		ClassWriter.appendImportStatements(fileBuffer, true);
-		ClassWriter.appendClassDeclaration(fileBuffer, file, true);
+		ClassWriter.appendImportStatements(fileBuffer, isAbstractModel);
+		ClassWriter.appendClassDeclaration(fileBuffer, file, isAbstractModel);
 		
 		// Fields declaration
 		@SuppressWarnings("unchecked")
@@ -87,26 +87,37 @@ public class JsonReverseReflector {
 			
 			if (fieldTypeName == null) {
 				// Not a primitive. Recursion ahead.
-				// TODO Handle JSONObject & JSONArray
-				fieldTypeName = object.getClass().getSimpleName();
+				
+				if (object instanceof JSONObject) {
+					
+					fieldTypeName = ClassWriter.uppercaseFirstChar(key);
+					
+					IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
+					FileUtils.create(newFile);
+					processJsonObjectFile((JSONObject) object, false, null, isPojo, cacheDuration, newFile);
+					
+				} else if (object instanceof JSONArray) {
+					// TODO
+					
+				} else {
+					//Unknown class
+					fieldTypeName = object.getClass().getSimpleName();
+				}
 			}
 			
 			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
 		}
 		fileBuffer.append("\n");
 		
-		ClassWriter.appendConstructor(fileBuffer, file, url, cacheDuration);
+		ClassWriter.appendConstructor(fileBuffer, file, url, cacheDuration, isAbstractModel);
 		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
-		ClassWriter.appendInheritAbstractMethods(fileBuffer, true);
+		ClassWriter.appendInheritAbstractMethods(fileBuffer, true, isAbstractModel);
 		ClassWriter.appendClassEnd(fileBuffer);
 		
-		monitor.worked(1);
-		monitor.setTaskName("Writing file(s)…");
-		
-		FileUtils.write(file, fileBuffer.toString(), monitor);
+		FileUtils.write(file, fileBuffer.toString());
 	}
 	
-	private static void processJsonArrayFile(JSONArray jsonArray, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) {
+	private static void processJsonArrayFile(JSONArray jsonArray, boolean isAbstractModel, String url, boolean isPojo, long cacheDuration, IFile file) {
 		
 	}
 }
