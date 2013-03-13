@@ -20,7 +20,6 @@ public class DataInputPage extends WizardPage {
 	private static final UrlValidator URL_VALIDATOR = new UrlValidator(new String[]{"http", "https"});
 
 	private Text mUrlText;
-	private Text mClassNameText;
 	private Button mRadioPojo;
 
 	public DataInputPage(ISelection selection) {
@@ -66,19 +65,6 @@ public class DataInputPage extends WizardPage {
 		radioGetSet.setLayoutData(radioGetSetFormData);
 		radioGetSet.setSelection(false);
 		
-		Label labelClassName = new Label(container, SWT.NULL);
-		labelClassName.setText("&Class name (optional):");
-		FormData labelClassNameFormData = new FormData();
-		labelClassNameFormData.top = new FormAttachment(radioGetSet, 20);
-		labelClassName.setLayoutData(labelClassNameFormData);
-
-		mClassNameText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		FormData classNameTextFormData = new FormData();
-		classNameTextFormData.left = new FormAttachment(labelClassName, 10);
-		classNameTextFormData.right = new FormAttachment(100);
-		classNameTextFormData.top = new FormAttachment(radioGetSet, 20);
-		mClassNameText.setLayoutData(classNameTextFormData);
-
 		setPageComplete(false);
 		setControl(container);
 	}
@@ -112,9 +98,5 @@ public class DataInputPage extends WizardPage {
 	
 	public boolean getIsPojo() {
 		return mRadioPojo.getSelection();
-	}
-	
-	public String getClassName() {
-		return mClassNameText.getText();
 	}
 }

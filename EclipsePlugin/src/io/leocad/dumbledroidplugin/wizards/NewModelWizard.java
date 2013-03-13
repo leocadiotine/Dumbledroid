@@ -6,13 +6,13 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -20,10 +20,9 @@ import org.eclipse.ui.IWorkbench;
 
 public class NewModelWizard extends Wizard implements INewWizard {
 
-	private ISelection mSelection;
+	private IStructuredSelection mSelection;
 
 	public NewModelWizard() {
-		super();
 		setNeedsProgressMonitor(true);
 	}
 	
@@ -34,8 +33,8 @@ public class NewModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		DataInputPage page = new DataInputPage(mSelection);
-		addPage(page);
+		addPage(new DataInputPage(mSelection));
+		addPage(new FileCreationPage(mSelection));
 	}
 	
 	/**
@@ -44,17 +43,19 @@ public class NewModelWizard extends Wizard implements INewWizard {
 	 */
 	public boolean performFinish() {
 		
-		DataInputPage page = (DataInputPage) getPage(DataInputPage.PAGE_NAME);
-		final String url = page.getUrl();
-		final boolean isPojo = page.getIsPojo();
-		final String className = page.getClassName();
+		DataInputPage dataPage = (DataInputPage) getPage(DataInputPage.PAGE_NAME);
+		final String url = dataPage.getUrl();
+		final boolean isPojo = dataPage.getIsPojo();
+		
+		FileCreationPage filePage = (FileCreationPage) getPage(FileCreationPage.PAGE_NAME);
+		final IFile newFile = filePage.createNewFile();
 		
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				
 				try {
-					DumbledroidClassCreator.create(url, isPojo, className,  monitor);
+					DumbledroidClassCreator.create(url, isPojo, newFile, monitor);
 					
 				} catch (Exception e) {
 					throw new InvocationTargetException(e);

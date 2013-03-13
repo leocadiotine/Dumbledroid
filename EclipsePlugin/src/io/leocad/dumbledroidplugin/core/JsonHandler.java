@@ -8,17 +8,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonHandler {
 
-	public static Map<String, String> parseJsonToFiles(HttpURLConnection connection, boolean isPojo, String className) throws InvalidUrlException, InvalidContentException {
+	public static void parseJsonToFiles(HttpURLConnection connection, boolean isPojo, IFile file) throws InvalidUrlException, InvalidContentException {
 		
 		String jsonString = getJsonString(connection);
 		
@@ -39,19 +38,11 @@ public class JsonHandler {
 			}
 		}
 		
-		Map<String, String> fileMap = new HashMap<String, String>();
-		
-		if (className == null || className.trim().equals("")) {
-			className = "DumbledroidJsonModel";
-		}
-
 		if (jsonObj != null) {
-			processObjectFileMap(jsonObj, fileMap, isPojo, className);
+			processObjectFileMap(jsonObj, isPojo, file);
 		} else {
-			processArrayFileMap(jsonArray, fileMap, isPojo, className);
+			processArrayFileMap(jsonArray, isPojo, file);
 		}
-		
-		return fileMap;
 	}
 
 	private static String getJsonString(HttpURLConnection connection) throws InvalidUrlException {
@@ -74,13 +65,17 @@ public class JsonHandler {
 		}
 	}
 	
-	private static void processObjectFileMap(JSONObject jsonObj, Map<String, String> fileMap, boolean isPojo, String className) {
+	private static void processObjectFileMap(JSONObject jsonObj, boolean isPojo, IFile file) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
 		StringBuffer settersBuffer = new StringBuffer();
 		
-		fileBuffer.append("public class ").append(className).append(" {\n");
+		fileBuffer.append("package ")
+		.append(FileUtils.getPackageName(file))
+		.append(";\n\n")
+		
+		.append("public class ").append(file.getName()).append(" {\n");
 		
 		@SuppressWarnings("unchecked")
 		Iterator<String> keys = jsonObj.keys();
@@ -124,11 +119,11 @@ public class JsonHandler {
 		.append(gettersBuffer)
 		.append(settersBuffer)
 		.append("\n}");
-		fileMap.put(className, fileBuffer.toString());
+		
 		System.out.println(fileBuffer.toString());
 	}
 	
-	private static void processArrayFileMap(JSONArray jsonArray, Map<String, String> fileMap, boolean isPojo, String className) {
+	private static void processArrayFileMap(JSONArray jsonArray, boolean isPojo, IFile file) {
 		
 	}
 }

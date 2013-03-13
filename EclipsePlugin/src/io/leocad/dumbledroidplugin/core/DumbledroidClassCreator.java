@@ -8,13 +8,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 public class DumbledroidClassCreator {
 
-	public static void create(String urlAddress, boolean isPojo, String className, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
+	public static void create(String urlAddress, boolean isPojo, IFile file, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
 
 		monitor.beginTask("Validating URL…", 3);
 
@@ -25,9 +25,11 @@ public class DumbledroidClassCreator {
 
 		monitor.setTaskName("Fetching and parsing URL contents…");
 
-		Map<String, String> fileMap = isJson?
-			JsonHandler.parseJsonToFiles(connection, isPojo, className):
-			XmlHandler.parseXmlToFiles(connection, isPojo, className);
+		if (isJson) {
+			JsonHandler.parseJsonToFiles(connection, isPojo, file);
+		} else {
+			XmlHandler.parseXmlToFiles(connection, isPojo, file);
+		}
 
 		monitor.worked(1);
 		monitor.setTaskName("Writing file(s)…");
