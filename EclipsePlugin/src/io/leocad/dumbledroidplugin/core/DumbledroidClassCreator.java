@@ -26,9 +26,9 @@ public class DumbledroidClassCreator {
 		monitor.setTaskName("Fetching and parsing URL contents…");
 
 		if (isJson) {
-			JsonHandler.parseJsonToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
+			JsonReverseReflector.parseJsonToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
 		} else {
-			XmlHandler.parseXmlToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
+			XmlReverseReflector.parseXmlToFiles(connection, urlAddress, isPojo, cacheDuration, file, monitor);
 		}
 		
 		monitor.worked(1);

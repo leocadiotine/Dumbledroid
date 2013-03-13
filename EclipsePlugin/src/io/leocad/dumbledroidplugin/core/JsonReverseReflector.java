@@ -16,7 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonHandler {
+public class JsonReverseReflector {
 
 	public static void parseJsonToFiles(HttpURLConnection connection, String url, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws InvalidUrlException, InvalidContentException {
 		
@@ -102,7 +102,7 @@ public class JsonHandler {
 			.append(object.getClass().getSimpleName())
 			.append(" ").append(key).append(";");
 			
-			//Accessor methods
+			// Buffer the accessor methods for posterior writing
 			if (!isPojo) {
 				
 				String keyCamelCase = Character.toUpperCase(key.charAt(0)) + key.substring(1);

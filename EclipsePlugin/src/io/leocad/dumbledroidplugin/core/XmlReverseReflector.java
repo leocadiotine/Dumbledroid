@@ -8,7 +8,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-public class XmlHandler {
+public class XmlReverseReflector {
 
 	public static Map<String, String> parseXmlToFiles(HttpURLConnection connection, String urlAddress, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws InvalidUrlException {
 		
