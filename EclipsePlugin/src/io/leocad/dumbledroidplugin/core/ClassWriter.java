@@ -17,7 +17,7 @@ public class ClassWriter {
 			.append("import io.leocad.dumbledroid.data.DataType;\n\n");
 
 		} else {
-			fileBuffer.append("import java.io.Serializable;\n");
+			fileBuffer.append("import java.io.Serializable;\n\n");
 		}
 	}
 
