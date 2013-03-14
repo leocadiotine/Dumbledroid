@@ -97,7 +97,20 @@ public class JsonReverseReflector {
 					processJsonObjectFile((JSONObject) object, false, null, isPojo, cacheDuration, newFile);
 					
 				} else if (object instanceof JSONArray) {
-					// TODO
+					
+					ClassWriter.appendListImport(fileBuffer);
+					//Find the type of the children
+					JSONArray array = (JSONArray) object;
+					Object child = array.get(0);
+					
+					if (child == null) { // Empty array
+						fieldTypeName = "List<Object>";
+						
+					} else if (child instanceof JSONObject) {
+						// TODO Non-primitive type
+					} else {
+						fieldTypeName = new StringBuffer("List<").append(child.getClass().getSimpleName()).append(">").toString();
+					}
 					
 				} else {
 					//Unknown class

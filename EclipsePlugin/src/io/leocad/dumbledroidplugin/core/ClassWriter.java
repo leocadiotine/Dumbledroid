@@ -104,4 +104,12 @@ public class ClassWriter {
 		return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
 	}
 
+	public static void appendListImport(StringBuffer fileBuffer) {
+		
+		//Find the position of the first import and put just before that.
+		int importPos = fileBuffer.indexOf("import");
+
+		fileBuffer.insert(importPos -1, "\nimport java.util.List;");
+	}
+
 }
