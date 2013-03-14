@@ -99,17 +99,24 @@ public class JsonReverseReflector {
 				} else if (object instanceof JSONArray) {
 					
 					ClassWriter.appendListImport(fileBuffer);
-					//Find the type of the children
+					
 					JSONArray array = (JSONArray) object;
 					Object child = array.get(0);
 					
 					if (child == null) { // Empty array
 						fieldTypeName = "List<Object>";
 						
-					} else if (child instanceof JSONObject) {
-						// TODO Non-primitive type
+					} else if (child instanceof JSONObject) { // Non-primitive type
+						final String childTypeName = ClassWriter.getArrayChildTypeName(key);
+						fieldTypeName = String.format("List<%s>", childTypeName);
+						
+						//Create files for the children
+						IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
+						FileUtils.create(newFile);
+						processJsonObjectFile((JSONObject) child, false, null, isPojo, cacheDuration, newFile);
+						
 					} else {
-						fieldTypeName = new StringBuffer("List<").append(child.getClass().getSimpleName()).append(">").toString();
+						fieldTypeName = String.format("List<%s>", child.getClass().getSimpleName());
 					}
 					
 				} else {

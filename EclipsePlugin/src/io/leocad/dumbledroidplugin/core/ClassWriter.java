@@ -112,4 +112,16 @@ public class ClassWriter {
 		fileBuffer.insert(importPos -1, "\nimport java.util.List;");
 	}
 
+	public static String getArrayChildTypeName(String fieldName) {
+
+		fieldName = uppercaseFirstChar(fieldName);
+		
+		if (fieldName.endsWith("s")) {
+			return fieldName.substring(0, fieldName.length() -1);
+		
+		} else {
+			return fieldName + "Item";
+		}
+	}
+
 }
