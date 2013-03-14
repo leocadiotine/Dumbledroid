@@ -13,7 +13,7 @@ public class InvalidContentException extends Exception {
 	@Override
 	public String getMessage() {
 		
-		return String.format("The provided '%s' is not invalid or corrupted. Please validate it here: %s", mContentType, getValidationUrl());
+		return String.format("The provided '%s' is invalid or corrupted. Please validate it here: %s", mContentType, getValidationUrl());
 	}
 	
 	private String getValidationUrl() {
