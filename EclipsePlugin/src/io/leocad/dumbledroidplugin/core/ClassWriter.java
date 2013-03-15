@@ -106,10 +106,13 @@ public class ClassWriter {
 
 	public static void appendListImport(StringBuffer fileBuffer) {
 		
-		//Find the position of the first import and put just before that.
-		int importPos = fileBuffer.indexOf("import");
-
-		fileBuffer.insert(importPos -1, "\nimport java.util.List;");
+		if (fileBuffer.indexOf("import java.util.List;") == -1) {
+		
+			//Find the position of the first import and put just before that.
+			int importPos = fileBuffer.indexOf("import");
+	
+			fileBuffer.insert(importPos -1, "\nimport java.util.List;");
+		}
 	}
 
 	public static String getArrayChildTypeName(String fieldName) {
