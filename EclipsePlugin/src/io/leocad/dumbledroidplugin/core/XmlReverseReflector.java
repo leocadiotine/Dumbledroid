@@ -3,7 +3,9 @@ package io.leocad.dumbledroidplugin.core;
 import io.leocad.dumbledroidplugin.exceptions.InvalidContentException;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -61,21 +63,50 @@ public class XmlReverseReflector {
 		// Then the child nodes
 		@SuppressWarnings("unchecked")
 		Iterator<Element> iterator = element.elementIterator();
+		// Twin children are sibling elements with the same name. We don't want to proccess all of them, just the first.
+		List<String> twinChildren = new ArrayList<String>();
+		
 		while (iterator.hasNext()) {
 			
 			Element child = (Element) iterator.next();
 			String key = child.getName();
+			
+			if (twinChildren.contains(key)) {
+				continue;
+			}
+			
 			String fieldTypeName;
 			
 			if (child.isTextOnly()) {
-				fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(child.getStringValue());
-				if (fieldTypeName == null) {
-					fieldTypeName = "String";
+				
+				// Check for Type 1 primitive arrays (see getArrayChild())
+				Element arrayChild = getArrayChild(child);
+				
+				if (arrayChild == null) {
+					
+					// Not an array
+					fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(child.getStringValue());
+					if (fieldTypeName == null) {
+						fieldTypeName = "String";
+					}
+				
+				} else {
+					// Array of primitive types
+					ClassWriter.appendListImport(fileBuffer);
+					
+					fieldTypeName = ClassMapper.getWrapperTypeNameByCasting(child.getStringValue());
+					if (fieldTypeName == null) {
+						fieldTypeName = "String";
+					}
+					fieldTypeName = String.format("List<%s>", fieldTypeName);
+					
+					// Mark the twin nodes, so the reverse reflection don't count them again
+					twinChildren.add(key);
 				}
 				
 			} else {
 				// Not a primitive. Recursion ahead.
-				fieldTypeName = mapField(file, child, fileBuffer, key, isPojo, cacheDuration);
+				fieldTypeName = mapField(file, child, fileBuffer, key, isPojo, cacheDuration, twinChildren);
 			}
 
 			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
@@ -90,44 +121,115 @@ public class XmlReverseReflector {
 		FileUtils.write(file, fileBuffer.toString());
 	}
 	
-	private static String mapField(IFile file, Element element, StringBuffer fileBuffer, String key, boolean isPojo, long cacheDuration) {
+	private static String mapField(IFile file, Element element, StringBuffer fileBuffer, String key, boolean isPojo, long cacheDuration, List<String> twinChildren) {
 
 		String fieldTypeName;
 		if (element.hasContent()) {
+			
+			Element arrayChild = getArrayChild(element);
+			
+			if (arrayChild == null) {
 
-			fieldTypeName = ClassWriter.uppercaseFirstChar(key);
+				// Nested object (not an array)
+				fieldTypeName = ClassWriter.uppercaseFirstChar(key);
+				
+				IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
+				FileUtils.create(newFile);
+				processXmlObjectFile((Element) element, false, null, isPojo, cacheDuration, newFile);
+				
+			} else {
+				// XML array
+				ClassWriter.appendListImport(fileBuffer);
+				
+				if (!arrayChild.isTextOnly()) { // Non-primitive type
 
-			IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
-			FileUtils.create(newFile);
-			processXmlObjectFile((Element) element, false, null, isPojo, cacheDuration, newFile);
+					final String childTypeName;
+					
+					// If the array is of type 1 (see getArrayChild()), the childTypeName is based on the name of the element.
+					if (arrayChild == element) { //Type 1
+						childTypeName = ClassWriter.uppercaseFirstChar(key);
+						twinChildren.add(key);
+						
+					} else {
+						// But if it's of type 2, the key is the name of the child itself
+						childTypeName = ClassWriter.uppercaseFirstChar( arrayChild.getName() );
+					}
+					
+					fieldTypeName = String.format("List<%s>", childTypeName);
+	
+					//Create files for the children
+					IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
+					FileUtils.create(newFile);
+					processXmlObjectFile(arrayChild, false, null, isPojo, cacheDuration, newFile);
 
-//		} else if (object instanceof JSONArray) { // TODO
-//
-//			ClassWriter.appendListImport(fileBuffer);
-//
-//			JSONArray array = (JSONArray) object;
-//			Object child = array.get(0);
-//
-//			if (child == null) { // Empty array
-//				fieldTypeName = "List<Object>";
-//
-//			} else if (child instanceof JSONObject) { // Non-primitive type
-//				final String childTypeName = ClassWriter.getArrayChildTypeName(key);
-//				fieldTypeName = String.format("List<%s>", childTypeName);
-//
-//				//Create files for the children
-//				IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
-//				FileUtils.create(newFile);
-//				processJsonObjectFile((JSONObject) child, false, null, isPojo, cacheDuration, newFile);
-//
-//			} else {
-//				fieldTypeName = String.format("List<%s>", child.getClass().getSimpleName());
-//			}
+				} else {
+					fieldTypeName = ClassMapper.getWrapperTypeNameByCasting(arrayChild.getStringValue());
+					if (fieldTypeName == null) {
+						fieldTypeName = "String";
+					}
+					
+					fieldTypeName = String.format("List<%s>", fieldTypeName);
+				}
+			}
 
 		} else {
 			// No children
 			fieldTypeName = "String";
 		}
 		return fieldTypeName;
+	}
+	
+	private static Element getArrayChild(Element element) {
+		/*
+		 * In XML, we can have two kinds of arrays:
+		 * 
+		 * Type 1:
+		 * <root>
+		 *     <listChild>
+		 *         <childMember1 />
+		 *         <childMember2 />
+		 *     </listChild>
+		 *     <listChild>
+		 *         <childMember1 />
+		 *         <childMember2 />
+		 *     </listChild>
+		 * </root>
+		 * 
+		 * Type 2:
+		 * <root>
+		 *     <list>
+		 *         <listChild>
+		 *             <childMember1 />
+		 *             <childMember2 />
+		 *         </listChild>
+		 *     </list>
+		 * </root>
+		 * 
+		 * To determine that, we must check if an element has siblings with the same name as it. If so,
+		 * it's an array of the type 1.
+		 */
+		
+		// Type 1: element with siblings with the same name
+		String name = element.getName();
+		Element parent = element.getParent();
+		if (parent.elements(name).size() > 1) {
+			return element;
+		}
+		
+		// Type 2: element with children with the same name
+		@SuppressWarnings("unchecked")
+		List<Element> children = element.elements();
+		
+		if (!children.isEmpty()) {
+			
+			Element child = children.get(0);
+			
+			if (child != null && element.elements(child.getName()).size() > 1) {
+				return child;
+			}
+		}
+		
+		// Not an array
+		return null;
 	}
 }
