@@ -25,8 +25,13 @@ public class DumbledroidClassCreator {
 		monitor.worked(1);
 
 		monitor.setTaskName("Writing files…");
-
-		InputStream is = connection.getInputStream();
+		
+		InputStream is;
+		try {
+			is = connection.getInputStream();
+		} catch (IOException e) {
+			throw new InvalidUrlException();
+		}
 
 		if (isJson) {
 			JsonReverseReflector.parseJsonToFiles(is, urlAddress, isPojo, cacheDuration, file);
