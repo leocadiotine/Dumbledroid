@@ -77,7 +77,7 @@ public class XmlReverseReflector {
 			
 			String fieldTypeName;
 			
-			if (child.isTextOnly()) {
+			if (child.isTextOnly() && child.attributeCount() == 0) {
 				
 				// Check for Type 1 primitive arrays (see getArrayChild())
 				Element arrayChild = getArrayChild(child);
@@ -110,6 +110,23 @@ public class XmlReverseReflector {
 			}
 
 			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
+		}
+		
+		// There is a special type of XML nodes with attributes, no children but a value.
+		// Something like this: <generator uri="http://www.flickr.com/">Flickr</generator>
+		// This kind of object won't be qualified as a primitive type nor will enter the
+		// loop above. Thus, we need to check specifically for them:
+		if (element.attributeCount() > 0 && element.isTextOnly()) {
+			
+			final String stringValue = element.getStringValue();
+			if (stringValue != null && !stringValue.trim().equals("")) {
+				
+				String fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(stringValue);
+				if (fieldTypeName == null) {
+					fieldTypeName = "String";
+				}
+				ClassWriter.appendFieldDeclaration(fileBuffer, "value", fieldTypeName, isPojo, gettersBuffer, settersBuffer);
+			}
 		}
 		fileBuffer.append("\n");
 		
@@ -174,7 +191,25 @@ public class XmlReverseReflector {
 
 		} else {
 			// No children
-			fieldTypeName = "String";
+			
+			if (element.attributeCount() > 0) {
+				// An empty element with attributes is like a nested object
+				fieldTypeName = ClassWriter.uppercaseFirstChar(key);
+				
+				IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
+				FileUtils.create(newFile);
+				processXmlObjectFile((Element) element, false, null, isPojo, cacheDuration, newFile);
+				
+				// And like the other nested objects, we need to check if it's part of an array,
+				if (getArrayChild(element) != null) {
+					ClassWriter.appendListImport(fileBuffer);
+					fieldTypeName = String.format("List<%s>", fieldTypeName);
+					twinChildren.add(element.getName());
+				}
+			
+			} else {
+				fieldTypeName = "String";
+			}
 		}
 		return fieldTypeName;
 	}
