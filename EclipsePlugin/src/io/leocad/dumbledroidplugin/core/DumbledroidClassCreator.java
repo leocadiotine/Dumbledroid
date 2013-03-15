@@ -68,7 +68,7 @@ public class DumbledroidClassCreator {
 
 		String contentType = connection.getContentType();
 
-		if (contentType.contains("json")) {
+		if (contentType.contains("json") || contentType.contains("javascript")) {
 			return true;
 		} else if (contentType.contains("xml")) {
 			return false;
