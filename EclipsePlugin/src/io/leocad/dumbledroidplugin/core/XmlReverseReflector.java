@@ -11,6 +11,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Path;
+import org.json.JSONArray;
 
 public class XmlReverseReflector {
 
@@ -48,12 +50,33 @@ public class XmlReverseReflector {
 			Attribute attribute = (Attribute) attributeIterator.next();
 			
 			String key = attribute.getName();
-			Object object = attribute.getData();
-			String fieldTypeName = ClassMapper.getPrimitiveTypeName(object); // Attributes can only be primitives
+			String fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(attribute.getValue());
+			 // Attributes can only be primitives
+			if (fieldTypeName == null) {
+				fieldTypeName = "String";
+			}
 			
 			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
 		}
 		
+		// Then the child nodes
+		@SuppressWarnings("unchecked")
+		Iterator<Element> iterator = element.elementIterator();
+		while (iterator.hasNext()) {
+			
+			Element child = (Element) iterator.next();
+			String key = child.getName();
+			Object object = child.getData();
+			String fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(child.getStringValue());
+
+			if (fieldTypeName == null) {
+				// Not a primitive. Recursion ahead.
+
+				fieldTypeName = mapField(file, object, fileBuffer, key, isPojo, cacheDuration);
+			}
+
+			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
+		}
 		fileBuffer.append("\n");
 		
 		ClassWriter.appendConstructor(fileBuffer, file, urlAddress, cacheDuration, isAbstractModel);
@@ -62,5 +85,47 @@ public class XmlReverseReflector {
 		ClassWriter.appendClassEnd(fileBuffer);
 
 		FileUtils.write(file, fileBuffer.toString());
+	}
+	
+	private static String mapField(IFile file, Object object, StringBuffer fileBuffer, String key, boolean isPojo, long cacheDuration) {
+
+		String fieldTypeName;
+		if (object instanceof Element) {
+
+			fieldTypeName = ClassWriter.uppercaseFirstChar(key);
+
+			IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
+			FileUtils.create(newFile);
+			processXmlObjectFile((Element) object, false, null, isPojo, cacheDuration, newFile);
+
+		} else if (object instanceof JSONArray) { // TODO
+			fieldTypeName = null; // TODO Remove me
+
+//			ClassWriter.appendListImport(fileBuffer);
+//
+//			JSONArray array = (JSONArray) object;
+//			Object child = array.get(0);
+//
+//			if (child == null) { // Empty array
+//				fieldTypeName = "List<Object>";
+//
+//			} else if (child instanceof JSONObject) { // Non-primitive type
+//				final String childTypeName = ClassWriter.getArrayChildTypeName(key);
+//				fieldTypeName = String.format("List<%s>", childTypeName);
+//
+//				//Create files for the children
+//				IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
+//				FileUtils.create(newFile);
+//				processJsonObjectFile((JSONObject) child, false, null, isPojo, cacheDuration, newFile);
+//
+//			} else {
+//				fieldTypeName = String.format("List<%s>", child.getClass().getSimpleName());
+//			}
+
+		} else {
+			//Unknown class
+			fieldTypeName = object.getClass().getSimpleName();
+		}
+		return fieldTypeName;
 	}
 }

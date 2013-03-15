@@ -21,9 +21,31 @@ public class ClassMapper {
 			
 		} else if (objClass == Boolean.class) {
 			return "boolean";
-			
-		} else if (objClass == String.class) {
-			return "String";
+		}
+		
+		return null;
+	}
+	
+	public static String getPrimitiveTypeNameByCasting(String value) {
+		
+		try {
+			Integer.valueOf(value);
+			return "int";
+		} catch (NumberFormatException e) {}
+		
+		try {
+			Long.valueOf(value);
+			return "long";
+		} catch (NumberFormatException e) {}
+		
+		try {
+			Double.valueOf(value); // Prefer double over float
+			return "double";
+		} catch (NumberFormatException e) {}
+		
+		final String valueLower = value.toLowerCase();
+		if (valueLower.equals("true") || valueLower.equals("false")) {
+			return "boolean";
 		}
 		
 		return null;
