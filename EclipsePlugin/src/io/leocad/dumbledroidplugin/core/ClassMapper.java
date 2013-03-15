@@ -21,6 +21,9 @@ public class ClassMapper {
 			
 		} else if (objClass == Boolean.class) {
 			return "boolean";
+			
+		} else if (objClass == String.class) {
+			return "String";
 		}
 		
 		return null;

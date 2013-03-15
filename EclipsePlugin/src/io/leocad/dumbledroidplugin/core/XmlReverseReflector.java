@@ -3,7 +3,9 @@ package io.leocad.dumbledroidplugin.core;
 import io.leocad.dumbledroidplugin.exceptions.InvalidContentException;
 
 import java.io.InputStream;
+import java.util.Iterator;
 
+import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -38,7 +40,21 @@ public class XmlReverseReflector {
 		ClassWriter.appendImportStatements(fileBuffer, isAbstractModel);
 		ClassWriter.appendClassDeclaration(fileBuffer, file, isAbstractModel);
 
-		// TODO Fields declaration
+		// Fields declaration
+		// First, the attributes
+		@SuppressWarnings("unchecked")
+		Iterator<Attribute> attributeIterator = element.attributeIterator();
+		while (attributeIterator.hasNext()) {
+			Attribute attribute = (Attribute) attributeIterator.next();
+			
+			String key = attribute.getName();
+			Object object = attribute.getData();
+			String fieldTypeName = ClassMapper.getPrimitiveTypeName(object); // Attributes can only be primitives
+			
+			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
+		}
+		
+		fileBuffer.append("\n");
 		
 		ClassWriter.appendConstructor(fileBuffer, file, urlAddress, cacheDuration, isAbstractModel);
 		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
