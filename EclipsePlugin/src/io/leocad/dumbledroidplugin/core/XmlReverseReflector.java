@@ -12,7 +12,6 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
-import org.json.JSONArray;
 
 public class XmlReverseReflector {
 
@@ -66,13 +65,17 @@ public class XmlReverseReflector {
 			
 			Element child = (Element) iterator.next();
 			String key = child.getName();
-			Object object = child.getData();
-			String fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(child.getStringValue());
-
-			if (fieldTypeName == null) {
+			String fieldTypeName;
+			
+			if (child.isTextOnly()) {
+				fieldTypeName = ClassMapper.getPrimitiveTypeNameByCasting(child.getStringValue());
+				if (fieldTypeName == null) {
+					fieldTypeName = "String";
+				}
+				
+			} else {
 				// Not a primitive. Recursion ahead.
-
-				fieldTypeName = mapField(file, object, fileBuffer, key, isPojo, cacheDuration);
+				fieldTypeName = mapField(file, child, fileBuffer, key, isPojo, cacheDuration);
 			}
 
 			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
@@ -87,20 +90,19 @@ public class XmlReverseReflector {
 		FileUtils.write(file, fileBuffer.toString());
 	}
 	
-	private static String mapField(IFile file, Object object, StringBuffer fileBuffer, String key, boolean isPojo, long cacheDuration) {
+	private static String mapField(IFile file, Element element, StringBuffer fileBuffer, String key, boolean isPojo, long cacheDuration) {
 
 		String fieldTypeName;
-		if (object instanceof Element) {
+		if (element.hasContent()) {
 
 			fieldTypeName = ClassWriter.uppercaseFirstChar(key);
 
 			IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
 			FileUtils.create(newFile);
-			processXmlObjectFile((Element) object, false, null, isPojo, cacheDuration, newFile);
+			processXmlObjectFile((Element) element, false, null, isPojo, cacheDuration, newFile);
 
-		} else if (object instanceof JSONArray) { // TODO
-			fieldTypeName = null; // TODO Remove me
-
+//		} else if (object instanceof JSONArray) { // TODO
+//
 //			ClassWriter.appendListImport(fileBuffer);
 //
 //			JSONArray array = (JSONArray) object;
@@ -123,8 +125,8 @@ public class XmlReverseReflector {
 //			}
 
 		} else {
-			//Unknown class
-			fieldTypeName = object.getClass().getSimpleName();
+			// No children
+			fieldTypeName = "String";
 		}
 		return fieldTypeName;
 	}
