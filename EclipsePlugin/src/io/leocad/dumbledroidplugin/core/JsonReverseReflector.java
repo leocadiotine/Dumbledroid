@@ -93,41 +93,7 @@ public class JsonReverseReflector {
 			if (fieldTypeName == null) {
 				// Not a primitive. Recursion ahead.
 
-				if (object instanceof JSONObject) {
-
-					fieldTypeName = ClassWriter.uppercaseFirstChar(key);
-
-					IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
-					FileUtils.create(newFile);
-					processJsonObjectFile((JSONObject) object, false, null, isPojo, cacheDuration, newFile);
-
-				} else if (object instanceof JSONArray) {
-
-					ClassWriter.appendListImport(fileBuffer);
-
-					JSONArray array = (JSONArray) object;
-					Object child = array.get(0);
-
-					if (child == null) { // Empty array
-						fieldTypeName = "List<Object>";
-
-					} else if (child instanceof JSONObject) { // Non-primitive type
-						final String childTypeName = ClassWriter.getArrayChildTypeName(key);
-						fieldTypeName = String.format("List<%s>", childTypeName);
-
-						//Create files for the children
-						IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
-						FileUtils.create(newFile);
-						processJsonObjectFile((JSONObject) child, false, null, isPojo, cacheDuration, newFile);
-
-					} else {
-						fieldTypeName = String.format("List<%s>", child.getClass().getSimpleName());
-					}
-
-				} else {
-					//Unknown class
-					fieldTypeName = object.getClass().getSimpleName();
-				}
+				fieldTypeName = mapField(file, object, fileBuffer, key, isPojo, cacheDuration);
 			}
 
 			ClassWriter.appendFieldDeclaration(fileBuffer, key, fieldTypeName, isPojo, gettersBuffer, settersBuffer);
@@ -144,5 +110,89 @@ public class JsonReverseReflector {
 
 	private static void processJsonArrayFile(JSONArray jsonArray, boolean isAbstractModel, String url, boolean isPojo, long cacheDuration, IFile file) {
 
+		StringBuffer fileBuffer = new StringBuffer();
+		StringBuffer gettersBuffer = new StringBuffer();
+		StringBuffer settersBuffer = new StringBuffer();
+
+		ClassWriter.appendPackageDeclaration(fileBuffer, file);
+		ClassWriter.appendImportStatements(fileBuffer, isAbstractModel);
+		ClassWriter.appendListImport(fileBuffer);
+		ClassWriter.appendClassDeclaration(fileBuffer, file, isAbstractModel);
+
+		// Field declaration
+		// Since the root node is an array, this class will have only one field, named "list"
+		String key = FileUtils.getFileNameWithoutExtension(file) + "List";
+		Object object = jsonArray.get(0);
+		
+		String fieldTypeName;
+		
+		if (object == null) {
+			// Empty array
+			fieldTypeName = "Object";
+			
+		} else {
+			fieldTypeName = ClassMapper.getPrimitiveTypeName(object);
+		}
+
+		if (fieldTypeName == null) {
+			// Not a primitive. Recursion ahead.
+			fieldTypeName = mapField(file, object, fileBuffer, key, isPojo, cacheDuration);
+			
+		} else {
+			// Primitive type. Convert to wrapper class
+			fieldTypeName = object.getClass().getSimpleName();
+		}
+		
+		fieldTypeName = String.format("List<%s>", fieldTypeName);
+		ClassWriter.appendFieldDeclaration(fileBuffer, "list", fieldTypeName, isPojo, gettersBuffer, settersBuffer);
+		fileBuffer.append("\n");
+
+		ClassWriter.appendConstructor(fileBuffer, file, url, cacheDuration, isAbstractModel);
+		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
+		ClassWriter.appendInheritAbstractMethods(fileBuffer, true, isAbstractModel);
+		ClassWriter.appendClassEnd(fileBuffer);
+
+		FileUtils.write(file, fileBuffer.toString());
+	}
+	
+	private static String mapField(IFile file, Object object, StringBuffer fileBuffer, String key, boolean isPojo, long cacheDuration) {
+
+		String fieldTypeName;
+		if (object instanceof JSONObject) {
+
+			fieldTypeName = ClassWriter.uppercaseFirstChar(key);
+
+			IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
+			FileUtils.create(newFile);
+			processJsonObjectFile((JSONObject) object, false, null, isPojo, cacheDuration, newFile);
+
+		} else if (object instanceof JSONArray) {
+
+			ClassWriter.appendListImport(fileBuffer);
+
+			JSONArray array = (JSONArray) object;
+			Object child = array.get(0);
+
+			if (child == null) { // Empty array
+				fieldTypeName = "List<Object>";
+
+			} else if (child instanceof JSONObject) { // Non-primitive type
+				final String childTypeName = ClassWriter.getArrayChildTypeName(key);
+				fieldTypeName = String.format("List<%s>", childTypeName);
+
+				//Create files for the children
+				IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
+				FileUtils.create(newFile);
+				processJsonObjectFile((JSONObject) child, false, null, isPojo, cacheDuration, newFile);
+
+			} else {
+				fieldTypeName = String.format("List<%s>", child.getClass().getSimpleName());
+			}
+
+		} else {
+			//Unknown class
+			fieldTypeName = object.getClass().getSimpleName();
+		}
+		return fieldTypeName;
 	}
 }
