@@ -5,6 +5,7 @@ import io.leocad.dumbledroidplugin.exceptions.InvalidUrlException;
 import io.leocad.dumbledroidplugin.exceptions.UnsupportedContentTypeException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,10 +26,12 @@ public class DumbledroidClassCreator {
 
 		monitor.setTaskName("Writing files…");
 
+		InputStream is = connection.getInputStream();
+
 		if (isJson) {
-			JsonReverseReflector.parseJsonToFiles(connection, urlAddress, isPojo, cacheDuration, file);
+			JsonReverseReflector.parseJsonToFiles(is, urlAddress, isPojo, cacheDuration, file);
 		} else {
-			XmlReverseReflector.parseXmlToFiles(connection, urlAddress, isPojo, cacheDuration, file);
+			XmlReverseReflector.parseXmlToFiles(is, urlAddress, isPojo, cacheDuration, file);
 		}
 		
 		monitor.worked(1);
