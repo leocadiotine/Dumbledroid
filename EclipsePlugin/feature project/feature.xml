@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="Dumbledroid_Feature_Project"
+      label="Dumbledroid Model Creator"
+      version="1.0"
+      provider-name="leocadiotine">
+
+   <description>
+      Enables creation of Dumbledroid Models.
+   </description>
+
+   <plugin
+         id="io.leocad.dumbledroidplugin"
+         download-size="0"
+         install-size="0"
+         version="1.0"
+         unpack="false"/>
+
+</feature>

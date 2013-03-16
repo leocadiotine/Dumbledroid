@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/Dumbledroid_Feature_Project_1.0.0.jar" id="Dumbledroid_Feature_Project" version="1.0">
+      <category name="leocadiotine_dumbledroid"/>
+   </feature>
+   <category-def name="leocadiotine_dumbledroid" label="Dumbledroid"/>
+</site>
