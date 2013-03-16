@@ -1,3 +1,3 @@
-[submodule "EclipsePlugin/src/org/json"]
-	path = EclipsePlugin/src/org/json
+[submodule "EclipsePlugin/plugin/src/org/json"]
+	path = EclipsePlugin/plugin/src/org/json
 	url = https://github.com/douglascrockford/JSON-java.git
