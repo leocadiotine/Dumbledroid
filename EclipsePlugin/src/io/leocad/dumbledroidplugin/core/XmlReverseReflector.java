@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Path;
 
 public class XmlReverseReflector {
 
-	public static void parseXmlToFiles(InputStream is, String urlAddress, boolean isPojo, long cacheDuration, IFile file) throws InvalidContentException {
+	public static void parseXmlToFiles(InputStream is, String urlAddress, String urlQueryString, boolean isPojo, long cacheDuration, IFile file) throws InvalidContentException {
 		
 		SAXReader reader = new SAXReader();
 		Document document;
@@ -30,10 +30,10 @@ public class XmlReverseReflector {
 		
 		//The root node is always unique, never an array
 		Element rootElement = document.getRootElement();
-		processXmlObjectFile(rootElement, true, urlAddress, isPojo, cacheDuration, file);
+		processXmlObjectFile(rootElement, true, urlAddress, urlQueryString, isPojo, cacheDuration, file);
 	}
 
-	private static void processXmlObjectFile(Element element, boolean isAbstractModel, String urlAddress, boolean isPojo, long cacheDuration, IFile file) {
+	private static void processXmlObjectFile(Element element, boolean isAbstractModel, String urlAddress, String urlQueryString, boolean isPojo, long cacheDuration, IFile file) {
 		
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
@@ -131,6 +131,7 @@ public class XmlReverseReflector {
 		fileBuffer.append("\n");
 		
 		ClassWriter.appendConstructor(fileBuffer, file, urlAddress, cacheDuration, isAbstractModel);
+		ClassWriter.appendOverridenLoad(fileBuffer, urlQueryString, isAbstractModel);
 		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
 		ClassWriter.appendInheritAbstractMethods(fileBuffer, false, isAbstractModel);
 		ClassWriter.appendClassEnd(fileBuffer);
@@ -152,7 +153,7 @@ public class XmlReverseReflector {
 				
 				IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
 				FileUtils.create(newFile);
-				processXmlObjectFile((Element) element, false, null, isPojo, cacheDuration, newFile);
+				processXmlObjectFile((Element) element, false, null, null, isPojo, cacheDuration, newFile);
 				
 			} else {
 				// XML array
@@ -177,7 +178,7 @@ public class XmlReverseReflector {
 					//Create files for the children
 					IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
 					FileUtils.create(newFile);
-					processXmlObjectFile(arrayChild, false, null, isPojo, cacheDuration, newFile);
+					processXmlObjectFile(arrayChild, false, null, null, isPojo, cacheDuration, newFile);
 
 				} else {
 					fieldTypeName = ClassMapper.getWrapperTypeNameByCasting(arrayChild.getStringValue());
@@ -198,7 +199,7 @@ public class XmlReverseReflector {
 				
 				IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
 				FileUtils.create(newFile);
-				processXmlObjectFile((Element) element, false, null, isPojo, cacheDuration, newFile);
+				processXmlObjectFile((Element) element, false, null, null, isPojo, cacheDuration, newFile);
 				
 				// And like the other nested objects, we need to check if it's part of an array,
 				if (getArrayChild(element) != null) {

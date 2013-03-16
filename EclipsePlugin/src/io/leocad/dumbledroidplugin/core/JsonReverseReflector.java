@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 public class JsonReverseReflector {
 
-	public static void parseJsonToFiles(InputStream is, String url, boolean isPojo, long cacheDuration, IFile file) throws InvalidUrlException, InvalidContentException {
+	public static void parseJsonToFiles(InputStream is, String url, String urlQueryString, boolean isPojo, long cacheDuration, IFile file) throws InvalidUrlException, InvalidContentException {
 
 		String jsonString = getJsonString(is);
 
@@ -39,9 +39,9 @@ public class JsonReverseReflector {
 		}
 
 		if (jsonObj != null) {
-			processJsonObjectFile(jsonObj, true, url, isPojo, cacheDuration, file);
+			processJsonObjectFile(jsonObj, true, url, urlQueryString, isPojo, cacheDuration, file);
 		} else {
-			processJsonArrayFile(jsonArray, true, url, isPojo, cacheDuration, file);
+			processJsonArrayFile(jsonArray, true, url, urlQueryString, isPojo, cacheDuration, file);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class JsonReverseReflector {
 		return total.toString();
 	}
 
-	private static void processJsonObjectFile(JSONObject jsonObj, boolean isAbstractModel, String url, boolean isPojo, long cacheDuration, IFile file) {
+	private static void processJsonObjectFile(JSONObject jsonObj, boolean isAbstractModel, String url, String urlQueryString, boolean isPojo, long cacheDuration, IFile file) {
 
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
@@ -101,6 +101,7 @@ public class JsonReverseReflector {
 		fileBuffer.append("\n");
 
 		ClassWriter.appendConstructor(fileBuffer, file, url, cacheDuration, isAbstractModel);
+		ClassWriter.appendOverridenLoad(fileBuffer, urlQueryString, isAbstractModel);
 		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
 		ClassWriter.appendInheritAbstractMethods(fileBuffer, true, isAbstractModel);
 		ClassWriter.appendClassEnd(fileBuffer);
@@ -108,7 +109,7 @@ public class JsonReverseReflector {
 		FileUtils.write(file, fileBuffer.toString());
 	}
 
-	private static void processJsonArrayFile(JSONArray jsonArray, boolean isAbstractModel, String url, boolean isPojo, long cacheDuration, IFile file) {
+	private static void processJsonArrayFile(JSONArray jsonArray, boolean isAbstractModel, String url, String urlQueryString, boolean isPojo, long cacheDuration, IFile file) {
 
 		StringBuffer fileBuffer = new StringBuffer();
 		StringBuffer gettersBuffer = new StringBuffer();
@@ -148,6 +149,7 @@ public class JsonReverseReflector {
 		fileBuffer.append("\n");
 
 		ClassWriter.appendConstructor(fileBuffer, file, url, cacheDuration, isAbstractModel);
+		ClassWriter.appendOverridenLoad(fileBuffer, urlQueryString, isAbstractModel);
 		ClassWriter.appendAccessorMethods(fileBuffer, gettersBuffer, settersBuffer);
 		ClassWriter.appendInheritAbstractMethods(fileBuffer, true, isAbstractModel);
 		ClassWriter.appendClassEnd(fileBuffer);
@@ -164,7 +166,7 @@ public class JsonReverseReflector {
 
 			IFile newFile = file.getParent().getFile(new Path(fieldTypeName + ".java"));
 			FileUtils.create(newFile);
-			processJsonObjectFile((JSONObject) object, false, null, isPojo, cacheDuration, newFile);
+			processJsonObjectFile((JSONObject) object, false, null, null, isPojo, cacheDuration, newFile);
 
 		} else if (object instanceof JSONArray) {
 
@@ -183,7 +185,7 @@ public class JsonReverseReflector {
 				//Create files for the children
 				IFile newFile = file.getParent().getFile(new Path(childTypeName + ".java"));
 				FileUtils.create(newFile);
-				processJsonObjectFile((JSONObject) child, false, null, isPojo, cacheDuration, newFile);
+				processJsonObjectFile((JSONObject) child, false, null, null, isPojo, cacheDuration, newFile);
 
 			} else {
 				fieldTypeName = String.format("List<%s>", child.getClass().getSimpleName());

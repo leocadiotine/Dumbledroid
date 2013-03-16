@@ -1,5 +1,9 @@
 package io.leocad.dumbledroidplugin.core;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 
 public class ClassWriter {
@@ -78,6 +82,50 @@ public class ClassWriter {
 			fileBuffer.append(");\n    }\n");
 		}
 	}
+	
+	public static void appendOverridenLoad(StringBuffer fileBuffer, String urlQueryString, boolean isAbstractModel) {
+
+		if (isAbstractModel && urlQueryString != null) {
+			
+			appendImport(fileBuffer, "import android.content.Context;");
+			appendImport(fileBuffer, "import java.util.List;");
+			appendImport(fileBuffer, "import java.util.Vector;");
+			appendImport(fileBuffer, "import org.apache.http.NameValuePair;");
+			appendImport(fileBuffer, "import org.apache.http.message.BasicNameValuePair;");
+			
+			Map<String, String> params = queryToParams(urlQueryString);
+			StringBuffer paramsAddBuffer = new StringBuffer();
+			
+			fileBuffer.append("\n    public void load(Context context, ");
+			
+			Set<String> keySet = params.keySet();
+			for (String key : keySet) {
+				
+				String value = params.get(key);
+				String type = ClassMapper.getPrimitiveTypeNameByCasting(value);
+				
+				fileBuffer.append(type == null? "String": type)
+				.append(" ").append(key).append(", ");
+				
+				paramsAddBuffer.append("        params.add( new BasicNameValuePair(\"")
+				.append(key).append("\", ");
+				
+				if (type != null) { // Primitive type
+					paramsAddBuffer.append("String.valueOf(").append(key).append(")");
+				} else {
+					paramsAddBuffer.append(key);
+				}
+				
+				paramsAddBuffer.append(") );\n");
+			}
+			// Remove last comma and space
+			fileBuffer.delete(fileBuffer.length() -2, fileBuffer.length());
+			
+			fileBuffer.append(") throws Exception {\n\n        List<NameValuePair> params = new Vector<NameValuePair>();\n");
+			fileBuffer.append(paramsAddBuffer);
+			fileBuffer.append("\n        super.load(context, params);\n    }\n");
+		}
+	}
 
 	public static void appendAccessorMethods(StringBuffer fileBuffer, StringBuffer gettersBuffer, StringBuffer settersBuffer) {
 
@@ -105,13 +153,17 @@ public class ClassWriter {
 	}
 
 	public static void appendListImport(StringBuffer fileBuffer) {
+		appendImport(fileBuffer, "import java.util.List;");
+	}
+	
+	private static void appendImport(StringBuffer fileBuffer, String importString) {
 		
-		if (fileBuffer.indexOf("import java.util.List;") == -1) {
-		
+		if (fileBuffer.indexOf(importString) == -1) {
+			
 			//Find the position of the first import and put just before that.
 			int importPos = fileBuffer.indexOf("import");
-	
-			fileBuffer.insert(importPos -1, "\nimport java.util.List;");
+			
+			fileBuffer.insert(importPos -1, "\n" + importString);
 		}
 	}
 
@@ -126,5 +178,18 @@ public class ClassWriter {
 			return fieldName + "Item";
 		}
 	}
+	
+	private static Map<String, String> queryToParams(String urlQueryString) {
 
+		Map<String,String> map = new HashMap<String, String>();
+		String[] keysAndValues = urlQueryString.split("&");
+		
+		for (String keyValue : keysAndValues) {
+			
+			String[] keyValueSplit = keyValue.split("=");
+			map.put(keyValueSplit[0], keyValueSplit[1]);
+		}
+		
+		return map;
+	}
 }

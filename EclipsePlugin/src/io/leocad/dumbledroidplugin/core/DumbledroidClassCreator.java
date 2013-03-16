@@ -18,8 +18,22 @@ public class DumbledroidClassCreator {
 	public static void create(String urlAddress, boolean isPojo, long cacheDuration, IFile file, IProgressMonitor monitor) throws UnsupportedContentTypeException, InvalidUrlException, InvalidContentException {
 
 		monitor.beginTask("Validating URL…", 2);
-
-		HttpURLConnection connection = validateAndOpenConnection(urlAddress);
+		URL url = null;
+		try {
+			url = new URL(urlAddress);
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
+			// Will never happen. The URL was already validated on UrlInputPage
+		}
+		
+		HttpURLConnection connection;
+		try {
+			connection = (HttpURLConnection) url.openConnection();
+			connection.connect();
+		} catch (IOException e2) {
+			// e.printStackTrace();
+			throw new InvalidUrlException();
+		}
 
 		boolean isJson = isJson(connection);
 		monitor.worked(1);
@@ -34,34 +48,12 @@ public class DumbledroidClassCreator {
 		}
 
 		if (isJson) {
-			JsonReverseReflector.parseJsonToFiles(is, urlAddress, isPojo, cacheDuration, file);
+			JsonReverseReflector.parseJsonToFiles(is, urlAddress, url.getQuery(), isPojo, cacheDuration, file);
 		} else {
-			XmlReverseReflector.parseXmlToFiles(is, urlAddress, isPojo, cacheDuration, file);
+			XmlReverseReflector.parseXmlToFiles(is, urlAddress, url.getQuery(), isPojo, cacheDuration, file);
 		}
 		
 		monitor.worked(1);
-	}
-
-	private static HttpURLConnection validateAndOpenConnection(String urlAddress) throws InvalidUrlException {
-
-		URL url = null;
-		try {
-			url = new URL(urlAddress);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			// Will never happen. The URL was already validated on UrlInputPage
-		}
-
-		HttpURLConnection connection = null;
-		try {
-			connection = (HttpURLConnection) url.openConnection();
-			connection.connect();
-		} catch (IOException e) {
-			// e.printStackTrace();
-			throw new InvalidUrlException();
-		}
-
-		return connection;
 	}
 
 	private static boolean isJson(HttpURLConnection connection) throws UnsupportedContentTypeException {
