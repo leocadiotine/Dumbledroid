@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Dumbledroid Model Creator
 Bundle-SymbolicName: io.leocad.dumbledroidplugin; singleton:=true
-Bundle-Version: 1.0
+Bundle-Version: 1.0.2
 Bundle-Vendor: leocadiotine
 Require-Bundle: org.eclipse.jface.text,
  org.eclipse.core.resources,
