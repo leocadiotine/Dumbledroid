@@ -51,9 +51,6 @@ public class DataInputPage extends WizardPage {
 		urlFormData.right = new FormAttachment(100);
 		mUrlText.setLayoutData(urlFormData);
 		
-		//DEBUG
-		mUrlText.setText("https://secure.flickr.com/services/feeds/photos_public.gne?format=xml&nojsoncallback=1&tags=android ");
-		
 		mUrlText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				onUrlChanged();
