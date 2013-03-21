@@ -114,7 +114,12 @@ public class JsonReflector {
 				return null;
 			}
 			
-			reflectJsonObject(obj, jsonObj.getJSONObject(nodeName));
+			if (!jsonObj.isNull(nodeName)) {
+				reflectJsonObject(obj, jsonObj.getJSONObject(nodeName));
+				
+			} else {
+				obj = null;
+			}
 			
 			return obj;
 		}
