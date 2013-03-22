@@ -9,6 +9,8 @@ Download the [example app on Google Play](https://play.google.com/store/apps/det
 ##Current version
 1.0 (20130227). Download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
 
+*Eclipse plugin*: install it using the update site: [http://leocad.io/dumbledroidplugin/](http://leocad.io/dumbledroidplugin/). Refer to instruction on how to install Eclipse plugins [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing_Eclipse_plugin).
+
 ##Purpose
 Dumbledroid is a framework that enables integration between an Android app and a RESTful server using magic. ~~Actually, it's not real magic. I'm kidding.~~
 
@@ -17,7 +19,7 @@ Using Dumbledroid, the developer doesn't have to write parsers for JSON or XML d
 Dumbledroid also does automatic caching in memory and in disk. *Presto!*
 
 ##Origin of the name
-Dumbledroid was named after the magician [Dumbledore](https://en.wikipedia.org/wiki/Dumbledore), a ~~blatant copy of Gandalf~~ major character of the *Harry Potter* series.
+Dumbledroid was named after the wizard [Dumbledore](https://en.wikipedia.org/wiki/Dumbledore), a ~~blatant copy of Gandalf~~ major character of the *Harry Potter* series.
 
 ##How it works
 This framework gets the names of the JSON/XML nodes and uses [reflection](http://docs.oracle.com/javase/tutorial/reflect/index.html) to find out the names of the class fields. Then, it maps the value of the first to the second.
@@ -41,8 +43,18 @@ Dumbledroid requires the following permissions to work:
 
 The `WRITE_EXTERNAL_STORAGE` is optional and is used by the disk cache.
 
-###Step 3: Write your classes
-You'll need to write your classes that correspond to your JSON or XML document.
+###Step 3: Generate (or write) your classes
+Dumbledroid has its own Eclipse plugin to generate the classes from an URL. You can find instructions on how to install it [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing_Eclipse_plugin).
+
+After installing it, go to the `File > New > Other…` menu and select `Dumbledore Model file`.
+
+![New Dumbledroid Model file](https://dl.dropbox.com/u/5135185/blog/dumbledroid-file-new.png)
+
+Then, just paste the URL for the JSON or XML, tweak the settings and *aparecium*! You're done!
+
+![Dumbledroid input URL](https://dl.dropbox.com/u/5135185/blog/dumbledroid-input-url.png)
+
+If you want to manually write your classes, you'll need to create the fields that correspond to your JSON or XML document.
 
 For example, if you have a JSON like this:
 
