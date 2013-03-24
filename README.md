@@ -9,7 +9,7 @@ Download the [example app on Google Play](https://play.google.com/store/apps/det
 ##Current version
 1.0 (20130227). Download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
 
-*Eclipse plugin*: install it using the update site: [http://leocad.io/dumbledroidplugin/](http://leocad.io/dumbledroidplugin/). Learn how to install the plugin [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing_Eclipse_plugin).
+*Eclipse plugin*: install it using the update site: [http://leocad.io/dumbledroidplugin/](http://leocad.io/dumbledroidplugin/). Learn how to install the plugin [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing-eclipse-plugin).
 
 ##Purpose
 Dumbledroid is a framework that enables integration between an Android app and a RESTful server using magic. ~~Actually, it's not real magic. I'm kidding.~~
@@ -44,7 +44,7 @@ Dumbledroid requires the following permissions to work:
 The `WRITE_EXTERNAL_STORAGE` is optional and is used by the disk cache.
 
 ###Step 3: Generate (or write) your classes
-Dumbledroid has its own Eclipse plugin to generate the classes from an URL. You can find instructions on how to install it [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing_Eclipse_plugin).
+Dumbledroid has its own Eclipse plugin to generate the classes from an URL. You can find instructions on how to install it [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing-eclipse-plugin).
 
 After installing it, go to the `File > New > Other…` menu and select `Dumbledroid Model file`.
 
