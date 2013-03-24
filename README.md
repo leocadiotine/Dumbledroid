@@ -29,7 +29,7 @@ It also adds non-intrusive memory caching using [SoftReferences](http://docs.ora
 Furthermore: its connection with the web service is smart. Dumbledroid only opens a connection and checks the headers. If the web service's version wasn't modified since the last time Dumbledroid downloaded it, the framework will use the cached version.
 
 ##Usage
-You can find a whole working example on the `DumbledoreExample` folder of this repository. It's a working Android project that uses the Dumbledore framework. But for the purposes of this manual, following are step by step instructions.
+You can find a whole working example on the `DumbledroidExample` folder of this repository. It's a working Android project that uses the Dumbledroid framework. But for the purposes of this manual, following are step by step instructions.
 
 ###Step 1: Add the framework to your Android project
 You can do this in two different ways: importing the Dumbledroid project on Eclipse and [referencing it as a library project](https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject) or simply copying the binary file (.jar) to the `libs` directory of your Android project. You can find the latest binary on the "Current Version" paragraph of this document.
@@ -46,7 +46,7 @@ The `WRITE_EXTERNAL_STORAGE` is optional and is used by the disk cache.
 ###Step 3: Generate (or write) your classes
 Dumbledroid has its own Eclipse plugin to generate the classes from an URL. You can find instructions on how to install it [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing_Eclipse_plugin).
 
-After installing it, go to the `File > New > Other…` menu and select `Dumbledore Model file`.
+After installing it, go to the `File > New > Other…` menu and select `Dumbledroid Model file`.
 
 ![New Dumbledroid Model file](https://dl.dropbox.com/u/5135185/blog/dumbledroid-file-new.png)
 
