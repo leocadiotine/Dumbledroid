@@ -68,7 +68,7 @@ public class DataController {
 				if ( modelHolder != null && lastModTimeMillis <= modelHolder.timestamp && ObjectCopier.copy(modelHolder.model, receiver)) {
 
 					//Discard the connection and return the cached version renewing the timestamp
-					modelHolder.timestamp = System.currentTimeMillis()
+					modelHolder.timestamp = System.currentTimeMillis();
 					return;
 				}
 			}
