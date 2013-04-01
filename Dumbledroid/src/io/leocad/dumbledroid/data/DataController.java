@@ -32,10 +32,9 @@ public class DataController {
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
 
-		checkConnection(ctx);
-		
 		HttpResponse httpResponse = null;
 		String cacheKey = getKey(receiver, params);
+		boolean checkedConnection = false;
 
 		//Get cached version
 		if (receiver.cacheDuration > 0) {
@@ -53,15 +52,22 @@ public class DataController {
 			}
 
 			try {
+				checkConnection(ctx);
+				checkedConnection = true;
 				httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
-				
-				//If there is some error on the connection, return the last cached version
+	
+			//If there is some error on the connection, return the last cached version
 			} catch (TimeoutException e) {
 				if (modelHolder != null) {
 					ObjectCopier.copy(modelHolder.model, receiver);
 				}
 				throw e;
 			} catch (IOException e) {
+				if (modelHolder != null) {
+					ObjectCopier.copy(modelHolder.model, receiver);
+				}
+				throw e;
+			} catch (NoConnectionException e) {
 				if (modelHolder != null) {
 					ObjectCopier.copy(modelHolder.model, receiver);
 				}
@@ -90,6 +96,10 @@ public class DataController {
 			}
 		}
 
+		if (!checkedConnection) {
+			checkConnection(ctx);
+		}
+		
 		if (httpResponse == null) {
 			httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
 		}
