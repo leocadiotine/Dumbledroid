@@ -9,6 +9,7 @@ import io.leocad.dumbledroid.data.xml.SaxParser;
 import io.leocad.dumbledroid.net.HttpLoader;
 import io.leocad.dumbledroid.net.HttpMethod;
 import io.leocad.dumbledroid.net.NoConnectionException;
+import io.leocad.dumbledroid.net.TimeoutException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,8 +52,23 @@ public class DataController {
 				return;
 			}
 
+			try {
+				httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
+				
+				//If there is some error on the connection, return the last cached version
+			} catch (TimeoutException e) {
+				if (modelHolder != null) {
+					ObjectCopier.copy(modelHolder.model, receiver);
+				}
+				throw e;
+			} catch (IOException e) {
+				if (modelHolder != null) {
+					ObjectCopier.copy(modelHolder.model, receiver);
+				}
+				throw e;
+			}
+
 			// Check also if it was modified on the server before downloading it
-			httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
 			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
 			if (lastModHeader != null) {
 				String lastMod = lastModHeader.getValue();
