@@ -23,7 +23,7 @@ public class ReflectionHelper {
 		}
 	}
 
-	public static Field[] getAllFields(Class<?> fieldClass) throws NoSuchFieldException {
+	public static Field[] getAllFields(Class<?> fieldClass) {
 		
 		Field[] fields = fieldClass.getDeclaredFields();
 		for (Field f : fields) {
@@ -33,7 +33,7 @@ public class ReflectionHelper {
 		Class<?> superclass = fieldClass.getSuperclass();
 		
 		if (superclass == null) {
-			throw new NoSuchFieldException();
+			return fields;
 		}
 		
 		return concatArrays(fields, getAllFields(superclass));
