@@ -11,7 +11,7 @@ public class ObjectCopier {
 		Class<?> srcClass = src.getClass();
 		Class<?> destClass = dest.getClass();
 
-		if (!srcClass.getName().equals(destClass.getName())) {
+		if (srcClass != destClass) {
 			return false;
 		}
 
