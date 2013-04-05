@@ -116,4 +116,4 @@ Pull requests are always welcome. So are donations :)
 
 To find me, buzz at `me[at]leocad.io` or [follow me on Twitter](http://www.twitter.com/leocadiotine). To read interesting stuff, go to [my blog](http://blog.leocad.io).
 
-Special thanks to [Luis Medeiros](https://github.com/lpmfilho), [diegocarloslima](https://github.com/diegocarloslima) and [santialbo](https://github.com/santialbo) for the pull requests!
+Special thanks to [Luis Medeiros](https://github.com/lpmfilho), [diegocarloslima](https://github.com/diegocarloslima) and [santialbo](https://github.com/santialbo) for the pull requests and to [jvfl](https://github.com/jvfl), [icfs](https://github.com/icfs), and [JJordani](https://github.com/JJordani) for the idea for the Eclipse plugin and the sample code to get me started.
