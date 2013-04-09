@@ -1,3 +1,6 @@
 [submodule "EclipsePlugin/plugin/src/org/json"]
 	path = EclipsePlugin/plugin/src/org/json
 	url = https://github.com/douglascrockford/JSON-java.git
+[submodule "libs/WebCachedImageView"]
+	path = libs/WebCachedImageView
+	url = https://github.com/leocadiotine/WebCachedImageView.git
