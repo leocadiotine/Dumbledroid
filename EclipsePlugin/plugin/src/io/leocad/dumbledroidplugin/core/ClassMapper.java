@@ -13,9 +13,6 @@ public class ClassMapper {
 		} else if (objClass == Long.class) {
 			return "long";
 			
-		} else if (objClass == Float.class) {
-			return "float";
-			
 		} else if (objClass == Double.class) {
 			return "double";
 			
