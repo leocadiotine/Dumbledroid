@@ -3,25 +3,22 @@ package io.leocad.dumbledoreexample.adapters;
 import io.leocad.dumbledoreexample.R;
 import io.leocad.dumbledoreexample.models.FlickrPhotos;
 import io.leocad.dumbledoreexample.models.PhotoItem;
-import io.leocad.dumbledoreexample.util.DrawableManager;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WebCachedImageView;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FlickrAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
 	private FlickrPhotos mPhotos;
-	private DrawableManager mDrawableMgr;
 
 	public FlickrAdapter(Context ctx, FlickrPhotos photos) {
 		mInflater = LayoutInflater.from(ctx);
 		mPhotos = photos;
-		mDrawableMgr = new DrawableManager();
 	}
 	
 	@Override
@@ -51,7 +48,7 @@ public class FlickrAdapter extends BaseAdapter {
 			convertView = mInflater.inflate(R.layout.flickr_result_row, parent, false);
 			holder = new ViewHolder();
 			
-			holder.image = (ImageView) convertView.findViewById(R.id.iv);
+			holder.image = (WebCachedImageView) convertView.findViewById(R.id.iv);
 			holder.title = (TextView) convertView.findViewById(R.id.tv_title);
 			holder.author = (TextView) convertView.findViewById(R.id.tv_author);
 			
@@ -64,7 +61,7 @@ public class FlickrAdapter extends BaseAdapter {
 		PhotoItem item = mPhotos.items.get(position);
 		holder.title.setText(item.title);
 		holder.author.setText(item.author);
-		mDrawableMgr.fetchDrawableOnThread(item.media.m, holder.image);
+		holder.image.setImageUrl(item.media.m);
 		
 		return convertView;
 	}
@@ -76,7 +73,7 @@ public class FlickrAdapter extends BaseAdapter {
 	}
 	
 	static class ViewHolder {
-		ImageView image;
+		WebCachedImageView image;
 		TextView title;
 		TextView author;
 	}

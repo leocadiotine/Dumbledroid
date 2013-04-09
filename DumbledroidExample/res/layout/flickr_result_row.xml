@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".activities.FlickrActivity" >
 
-    <ImageView
+    <WebCachedImageView
         android:id="@+id/iv"
         android:layout_width="90dp"
         android:layout_height="90dp"
