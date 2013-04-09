@@ -26,7 +26,7 @@ public abstract class AbstractModel implements Serializable {
 	protected abstract DataType getDataType();
 
 	protected AbstractModel(String url) {
-		this(url, DEFAULT_ENCODING);
+		this(url, DEFAULT_ENCODING, -1L);
 	}
 
 	protected AbstractModel(String _url, long _cacheDuration) {
@@ -44,7 +44,7 @@ public abstract class AbstractModel implements Serializable {
 	}
 
 	public void load(Context ctx) throws Exception {
-		load(ctx, null);
+		load(ctx, null, null);
 	}
 
 	protected void load(Context ctx, List<NameValuePair> params) throws Exception {
