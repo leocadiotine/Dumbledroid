@@ -35,28 +35,30 @@ public class JsonReflector {
 		Class<?> modelClass = model.getClass();
 		JSONArray names = jsonObj.names();
 
-		for (int i = 0; i < names.length(); i++) {
-
-			String name = names.getString(i);
-
-			try {
-				Field field = ReflectionHelper.getField(modelClass, name);
-
-				if (field.getType() == List.class) {
-					processListField(model, field, jsonObj.getJSONArray(name));
-
-				} else {
-					processSingleField(model, field, jsonObj, name);
+		if (names != null) {
+			for (int i = 0; i < names.length(); i++) {
+	
+				String name = names.getString(i);
+	
+				try {
+					Field field = ReflectionHelper.getField(modelClass, name);
+	
+					if (field.getType() == List.class) {
+						processListField(model, field, jsonObj.getJSONArray(name));
+	
+					} else {
+						processSingleField(model, field, jsonObj, name);
+					}
+	
+				} catch (NoSuchFieldException e) {
+					Log.w(JsonReflector.class.getName(), "Can not locate field named " + name);
+	
+				} catch (IllegalAccessException e) {
+					Log.w(JsonReflector.class.getName(), "Can not access field named " + name);
+				
+				} catch (InstantiationException e) {
+					Log.w(JsonReflector.class.getName(), "Can not create an instance of the type defined in the field named " + name);
 				}
-
-			} catch (NoSuchFieldException e) {
-				Log.w(JsonReflector.class.getName(), "Can not locate field named " + name);
-
-			} catch (IllegalAccessException e) {
-				Log.w(JsonReflector.class.getName(), "Can not access field named " + name);
-			
-			} catch (InstantiationException e) {
-				Log.w(JsonReflector.class.getName(), "Can not create an instance of the type defined in the field named " + name);
 			}
 		}
 	}
