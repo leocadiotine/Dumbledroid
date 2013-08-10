@@ -105,6 +105,11 @@ public class JsonReflector {
 
 		} else if (type == double.class || type == Double.class) {
 			return jsonObj.getDouble(nodeName);
+			
+		} else if (type.isEnum()) {
+			Object[] enumConstantsArray =  type.getEnumConstants();
+			int index = jsonObj.getInt(nodeName);
+			return enumConstantsArray[index];
 
 		} else {
 			Object obj;

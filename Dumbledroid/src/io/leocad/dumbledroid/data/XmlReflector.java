@@ -135,6 +135,11 @@ public class XmlReflector {
 		} else if (type == double.class || type == Double.class) {
 			return Double.valueOf(node.text);
 
+		} else if (type.isEnum()) {
+			Object[] enumConstantsArray =  type.getEnumConstants();
+			int index = Integer.valueOf(node.text);
+			return enumConstantsArray[index];
+			
 		} else {
 			Object obj;
 			try {
