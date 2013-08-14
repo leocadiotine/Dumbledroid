@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.impl.cookie.DateParseException;
 import org.apache.http.impl.cookie.DateUtils;
 import org.json.JSONException;
 import org.xml.sax.SAXException;
@@ -25,73 +26,72 @@ import org.xml.sax.SAXException;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.ParseException;
 
 
 public class DataController {
 
 	public static void load(Context ctx, AbstractModel receiver, DataType dataType, List<NameValuePair> params, HttpMethod method) throws Exception {
 
+		final String cacheKey = getKey(receiver, params);
 		HttpResponse httpResponse = null;
-		String cacheKey = getKey(receiver, params);
 		boolean checkedConnection = false;
+		ModelHolder modelHolder = null;
 
 		//Get cached version
 		if (receiver.cacheDuration > 0) {
 
 			//In memory
-			AbstractModel cached = MemoryCache.getInstance().getCachedOrNull(cacheKey);
-			if (cached != null && ObjectCopier.copy(cached, receiver)) {
-				return;
-			}
-
-			//In disk
-			ModelHolder modelHolder = DiskCache.getInstance(ctx).getCached(cacheKey);
+			modelHolder = MemoryCache.getInstance().getCached(cacheKey);
 			if (modelHolder != null && !modelHolder.isExpired() && ObjectCopier.copy(modelHolder.model, receiver)) {
 				return;
 			}
 
-			try {
-				checkConnection(ctx);
-				checkedConnection = true;
-				httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
-	
-			//If there is some error on the connection, return the last cached version
-			} catch (TimeoutException e) {
-				if (modelHolder != null) {
-					ObjectCopier.copy(modelHolder.model, receiver);
+			//In disk
+			if(modelHolder == null) {
+				modelHolder = DiskCache.getInstance(ctx).getCached(cacheKey);
+				if (modelHolder != null && !modelHolder.isExpired() && ObjectCopier.copy(modelHolder.model, receiver)) {
+					MemoryCache.getInstance().cache(cacheKey, modelHolder);
+					return;
 				}
-				throw e;
-			} catch (IOException e) {
-				if (modelHolder != null) {
-					ObjectCopier.copy(modelHolder.model, receiver);
-				}
-				throw e;
-			} catch (NoConnectionException e) {
-				if (modelHolder != null) {
-					ObjectCopier.copy(modelHolder.model, receiver);
-				}
-				throw e;
 			}
 
 			// Check also if it was modified on the server before downloading it
-			Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
-			if (lastModHeader != null) {
-				String lastMod = lastModHeader.getValue();
-				
-				long lastModTimeMillis;
-				
+			if(modelHolder != null) {
 				try {
-					lastModTimeMillis = DateUtils.parseDate(lastMod).getTime();
-				} catch (ParseException e) {
-					lastModTimeMillis = -1;
-				}
+					checkConnection(ctx);
+					checkedConnection = true;
+					httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
+					final Header lastModHeader = httpResponse.getFirstHeader("Last-Modified");
 
-				if ( modelHolder != null && lastModTimeMillis <= modelHolder.timestamp && ObjectCopier.copy(modelHolder.model, receiver)) {
+					if (lastModHeader != null) {
+						final String lastMod = lastModHeader.getValue();
+						long lastModTimeMillis = Long.MAX_VALUE;
+						try {
+							lastModTimeMillis = DateUtils.parseDate(lastMod).getTime();
+						} catch (DateParseException e) {}
 
-					//Discard the connection and return the cached version renewing the timestamp
-					modelHolder.timestamp = System.currentTimeMillis();
-					return;
+						if (modelHolder != null && lastModTimeMillis <= modelHolder.timestamp && ObjectCopier.copy(modelHolder.model, receiver)) {
+							//Discard the connection and return the cached version renewing the timestamp
+							modelHolder.timestamp = System.currentTimeMillis();
+							MemoryCache.getInstance().cache(cacheKey, modelHolder);
+							DiskCache.getInstance(ctx).cache(cacheKey, modelHolder);
+							return;
+						}
+					}
+
+				//If there is some error on the connection, return the last cached version
+				} catch (TimeoutException e) {
+					if(modelHolder !=  null && ObjectCopier.copy(modelHolder.model, receiver)) {
+						return;
+					}
+				} catch (NoConnectionException e) {
+					if(modelHolder !=  null && ObjectCopier.copy(modelHolder.model, receiver)) {
+						return;
+					}
+				} catch (IOException e) {
+					if(modelHolder !=  null && ObjectCopier.copy(modelHolder.model, receiver)) {
+						return;
+					}
 				}
 			}
 		}
@@ -99,11 +99,11 @@ public class DataController {
 		if (!checkedConnection) {
 			checkConnection(ctx);
 		}
-		
+
 		if (httpResponse == null) {
 			httpResponse = HttpLoader.getHttpResponse(receiver.url, receiver.encoding, params, method);
 		}
-		InputStream is = HttpLoader.getHttpContent(httpResponse);
+		final InputStream is = HttpLoader.getHttpContent(httpResponse);
 
 		switch (dataType) {
 		case JSON:
@@ -117,16 +117,17 @@ public class DataController {
 
 		//Cache
 		if (receiver.cacheDuration > 0) {
-			MemoryCache.getInstance().cache(cacheKey, receiver);
-			DiskCache.getInstance(ctx).cache(cacheKey, receiver);
+			modelHolder = new ModelHolder(receiver, System.currentTimeMillis());
+			MemoryCache.getInstance().cache(cacheKey, modelHolder);
+			DiskCache.getInstance(ctx).cache(cacheKey, modelHolder);
 		}
 	}
-	
+
 	private static void checkConnection(Context ctx) throws NoConnectionException {
 
 		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-		
+
 		if (netInfo == null || !netInfo.isConnectedOrConnecting()) {
 			throw new NoConnectionException();
 		}
