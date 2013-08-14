@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import android.content.Context;
 import android.util.Log;
@@ -15,18 +17,20 @@ public class DiskCache {
 
 	private static final String TAG = "DiskCache";
 
-	private static DiskCache INSTANCE;
+	private static DiskCache sInstance;
 	/**
 	 * @param ctx ALWAYS USE getApplicationContext() here.
 	 * @return
 	 */
-	public static DiskCache getInstance(Context ctx) {
-
-		if (INSTANCE == null) {
-			INSTANCE = new DiskCache(ctx);
+	public static DiskCache getInstance(Context context) {
+		if (sInstance == null) {
+			synchronized (DiskCache.class) {
+				if (sInstance == null) {
+					sInstance = new DiskCache(context);
+				}
+			}
 		}
-
-		return INSTANCE;
+		return sInstance;
 	}
 
 	private final FileController mFileCtrl;
@@ -36,45 +40,90 @@ public class DiskCache {
 	}
 
 	public void cache(String key, AbstractModel model) {
+		final String fileName = getHashKey(key);
+		final ModelHolder holder = new ModelHolder(model, System.currentTimeMillis());
 
-		String fileName = String.valueOf(key.hashCode());
-
-		ModelHolder holder = new ModelHolder(model, System.currentTimeMillis());
+		FileOutputStream fos = null;
+		ObjectOutputStream oos = null;
 
 		try {
-			FileOutputStream fos = mFileCtrl.getFileOutputStream(fileName);
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			fos = mFileCtrl.getFileOutputStream(fileName);
+			oos = new ObjectOutputStream(fos);
 			oos.writeObject(holder);
-
-			oos.flush();
-			oos.close();
-
-			fos.flush();
-			fos.close();
-
 		} catch (IOException e) {
-			Log.w(TAG, "The file " + fileName + "couldn't be cached. Does this app have permission to ACCESS_EXTERNAL_STORAGE?", e);
+			Log.w(TAG, "The file " + fileName + " couldn't be cached. Does this app have permission to ACCESS_EXTERNAL_STORAGE ?", e);
+		} finally {
+			if(fos != null) {
+				try {
+					fos.flush();
+					fos.close();
+				} catch (IOException e) {
+					Log.w(TAG, Log.getStackTraceString(e));
+				}
+			}
+			if(oos != null) {
+				try {
+					oos.flush();
+					oos.close();
+				} catch (IOException e) {
+					Log.w(TAG, Log.getStackTraceString(e));
+				}
+			}
 		}
 	}
 
 	public ModelHolder getCached(String key) {
+		final String fileName = getHashKey(key);
 
-		String fileName = String.valueOf(key.hashCode());
-
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
 		try {
-			FileInputStream fis = mFileCtrl.getFileInputStream(fileName);
-			ObjectInputStream ois = new ObjectInputStream(fis);
-
-			ModelHolder holder = (ModelHolder) ois.readObject();
-
-			ois.close();
-			fis.close();
-
+			fis = mFileCtrl.getFileInputStream(fileName);
+			ois = new ObjectInputStream(fis);
+			final ModelHolder holder = (ModelHolder) ois.readObject();
 			return holder;
-
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Log.w(TAG, "Can't access file: " + fileName, e);
-			return null;
+		} catch (ClassNotFoundException e) {
+			Log.w(TAG, "Can't read object from file: " + fileName, e);
+		} finally {
+			if(fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					Log.w(TAG, Log.getStackTraceString(e));
+				}
+			}
+			if(ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					Log.w(TAG, Log.getStackTraceString(e));
+				}
+			}
 		}
+		return null;
+	}
+
+	private static String getHashKey(String key) {
+		try {
+			final MessageDigest mDigest = MessageDigest.getInstance("SHA-1");
+			mDigest.update(key.getBytes());
+			return bytesToHexString(mDigest.digest());
+		} catch (NoSuchAlgorithmException e) {}
+		return String.valueOf(key.hashCode());
+	}
+
+	private static String bytesToHexString(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < bytes.length; i++) {
+			final String hex = Integer.toHexString(0xFF & bytes[i]);
+			if (hex.length() == 1) {
+				sb.append('0');
+			}
+			sb.append(hex);
+		}
+		return sb.toString();
 	}
 }
