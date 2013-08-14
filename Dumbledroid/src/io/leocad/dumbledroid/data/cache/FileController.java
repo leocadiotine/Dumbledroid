@@ -4,78 +4,64 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 
 public class FileController {
 
-	private static String EXTERNAL_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/data/data/";
+	private static final String DUMBLEDROID_CACHE_DIR = "dumbledroid";
 
 	private final Context mContext;
-	private String mExternalDataDirectory;
 
 	public FileController(Context ctx) {
 		mContext = ctx;
-
-		if (isSdCardAvailable()) {
-			mExternalDataDirectory = EXTERNAL_DATA_DIRECTORY + mContext.getPackageName() + "/";
-
-			//Create the directory (if it doesn't exists)
-			File directory = new File(mExternalDataDirectory);
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
-		}
 	}
 
-	public FileInputStream getFileInputStream(String filename) throws FileNotFoundException {
-		FileInputStream fis = null;
-
-		if (isSdCardAvailable()) {
-			fis = new FileInputStream( new File(mExternalDataDirectory + filename) );
-		} else {
-			fis = mContext.openFileInput(filename);
-		}
-
-		return fis;
+	public FileInputStream getFileInputStream(String fileName) throws FileNotFoundException {
+		final File file = new File(getCacheDir(), fileName);
+		return new FileInputStream(file);
 	}
 
-	public FileOutputStream getFileOutputStream(String filename) throws IOException {
-		FileOutputStream fos = null;
-
-		if (isSdCardAvailable()) {
-
-			File file = new File(mExternalDataDirectory + filename);
-
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			fos = new FileOutputStream(file);
-
-		} else {
-			fos = mContext.openFileOutput(filename, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE);
-		}
-
-		return fos;
+	public FileOutputStream getFileOutputStream(String fileName) throws FileNotFoundException {
+		final File file = new File(getCacheDir(), fileName);
+		file.getParentFile().mkdirs();
+		return new FileOutputStream(file);
 	}
 
 	public void erase(String fileName) {
-		File file = null;
-
-		if (isSdCardAvailable()) {
-			file = new File(mExternalDataDirectory + fileName);
-
-		} else  {
-			file = mContext.getFileStreamPath(fileName);
-		}
-
+		final File file = new File(getCacheDir(), fileName);
 		file.delete();
 	}
 
-	private static boolean isSdCardAvailable() {
-		String state = Environment.getExternalStorageState();
-		return Environment.MEDIA_MOUNTED.equals(state);
+	private File getCacheDir() {
+		final File cacheDir = isExternalStorageAvailable() ? getExternalCacheDir() : mContext.getCacheDir();
+		return new File(cacheDir, DUMBLEDROID_CACHE_DIR);
+	}
+
+	@TargetApi(8)
+	private File getExternalCacheDir() {
+		if (Build.VERSION.SDK_INT >= 8) {
+			final File externalCacheDir = mContext.getExternalCacheDir();
+			if(externalCacheDir != null) {
+				return externalCacheDir;
+			}
+		}
+		final String cacheDirPath = "Android" + File.separator + "data" + File.separator + mContext.getPackageName() + File.separator + "cache";
+		return new File(Environment.getExternalStorageDirectory(), cacheDirPath);
+	}
+
+	private static boolean isExternalStorageAvailable() {
+		return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) || !isExternalStorageRemovable();
+	}
+
+	@TargetApi(9)
+	private static boolean isExternalStorageRemovable() {
+		if (Build.VERSION.SDK_INT >= 9) {
+			return Environment.isExternalStorageRemovable();
+		}
+		return true;
 	}
 }
