@@ -18,7 +18,7 @@ public class XmlReflector {
 		Field rootNodeField = null;
 
 		try {
-			rootNodeField = ReflectionHelper.getField(modelClass, node.name);
+			rootNodeField = ReflectionHelper.getFieldInHierarchy(modelClass, node.name);
 
 		} catch (NoSuchFieldException e) {
 		}
@@ -50,7 +50,7 @@ public class XmlReflector {
 
 
 				try {
-					Field field = ReflectionHelper.getField(modelClass, key);
+					Field field = ReflectionHelper.getFieldInHierarchy(modelClass, key);
 
 					Class<?> type = field.getType();
 
@@ -94,7 +94,7 @@ public class XmlReflector {
 	private static void accessFieldAndProcess(Object model, Class<?> modelClass, Node node, Node parentNode) {
 
 		try {
-			Field field = ReflectionHelper.getField(modelClass, node.name);
+			Field field = ReflectionHelper.getFieldInHierarchy(modelClass, node.name);
 
 			if (field.getType() == List.class) {
 				processListField(model, field, node, parentNode);
@@ -226,7 +226,7 @@ public class XmlReflector {
 			}
 
 			return list;
-			
+
 		} else {
 			Log.w(XmlReflector.class.getName(), "The field named " + node.name + " has no children nor namesakes and has been declared as a List. Will be null.");
 			return null;
