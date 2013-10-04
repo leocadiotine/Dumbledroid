@@ -1,12 +1,8 @@
 package io.leocad.dumbledroid.data.cache;
 
-import io.leocad.dumbledroid.data.AbstractModel;
-
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
-
-import android.util.Log;
 
 public class MemoryCache {
 
@@ -14,41 +10,28 @@ public class MemoryCache {
 	public static MemoryCache getInstance() {
 		return INSTANCE;
 	}
-	
+
 	private Map<String, SoftReference<ModelHolder>> mMap;
-	
+
 	private MemoryCache() {
 		mMap = new HashMap<String, SoftReference<ModelHolder>>();
 	}
-	
-	public void cache(String key, AbstractModel model) {
-		
-		ModelHolder holder = new ModelHolder(model, System.currentTimeMillis());
-		
-		SoftReference<ModelHolder> ref = new SoftReference<ModelHolder>(holder);
+
+	public void cache(String key, ModelHolder holder) {
+		final SoftReference<ModelHolder> ref = new SoftReference<ModelHolder>(holder);
 		mMap.put(key, ref);
 	}
-	
-	public AbstractModel getCachedOrNull(String key) {
 
-		SoftReference<ModelHolder> softReference = mMap.get(key);
-		
-		if (softReference == null) {
+	public ModelHolder getCached(String key) {
+		final SoftReference<ModelHolder> reference = mMap.get(key);
+		if (reference == null) {
 			return null;
 		}
-		
-		ModelHolder modelHolder = softReference.get();
-		
-		if (modelHolder == null || modelHolder.isExpired()) {
-			//Clear from cache
-			softReference.clear();
+		final ModelHolder holder = reference.get();
+		if(holder == null) {
+			reference.clear();
 			mMap.remove(key);
-			
-			Log.v("MemoryCache", "Expired from memory! " + key);
-			
-			return null;
 		}
-		
-		return modelHolder.model;
+		return holder;
 	}
 }

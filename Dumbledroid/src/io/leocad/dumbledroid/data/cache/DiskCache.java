@@ -1,7 +1,5 @@
 package io.leocad.dumbledroid.data.cache;
 
-import io.leocad.dumbledroid.data.AbstractModel;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,11 +33,9 @@ public class DiskCache {
 		mFileCtrl = new FileController(ctx);
 	}
 
-	public void cache(String key, AbstractModel model) {
+	public void cache(String key, ModelHolder holder) {
 
 		String fileName = String.valueOf(key.hashCode());
-
-		ModelHolder holder = new ModelHolder(model, System.currentTimeMillis());
 
 		try {
 			FileOutputStream fos = mFileCtrl.getFileOutputStream(fileName);
