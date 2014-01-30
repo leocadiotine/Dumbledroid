@@ -7,7 +7,11 @@ Android + webservice = magic!
 Download the [example app on Google Play](https://play.google.com/store/apps/details?id=io.leocad.dumbledoreexample) to see it in action!
 
 ##Current version
-1.0 (20130227). Download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
+1.0 (20130227)
+
+*Android Studio / Maven users*: `'io.leocad:dumbledroid:1.0'`
+
+*Eclipse users*: download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
 
 *Eclipse plugin*: install it using the update site: [http://leocad.io/dumbledroidplugin/](http://leocad.io/dumbledroidplugin/). Learn how to install the plugin [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing-eclipse-plugin).
 
@@ -32,6 +36,19 @@ Furthermore: its connection with the web service is smart. Dumbledroid only open
 You can find a whole working example on the `DumbledroidExample` folder of this repository. It's a working Android project that uses the Dumbledroid framework. But for the purposes of this manual, following are step by step instructions.
 
 ###Step 1: Add the framework to your Android project
+
+#### *Using Android Studio?*
+Add this to your project's `build.gradle`:
+
+    repositories {
+        maven { url 'http://leocad.io/mvn' }
+    }
+    
+    dependencies {
+	    compile 'io.leocad:dumbledroid:1.0'
+	}
+
+#### *Using Eclipse?*
 You can do this in two different ways: importing the Dumbledroid project on Eclipse and [referencing it as a library project](https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject) or simply copying the binary file (.jar) to the `libs` directory of your Android project. You can find the latest binary on the "Current Version" paragraph of this document.
 
 ###Step 2: Add the permissions to your AndroidManifest.xml
@@ -44,7 +61,9 @@ Dumbledroid requires the following permissions to work:
 The `WRITE_EXTERNAL_STORAGE` is optional and is used by the disk cache.
 
 ###Step 3: Generate (or write) your classes
-Dumbledroid has its own Eclipse plugin to generate the classes from an URL. You can find instructions on how to install it [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing-eclipse-plugin).
+Dumbledroid has its own Eclipse plugin to generate the classes from a URL. Unfortunately, there is no plugin for Android Studio just yet. If you're using Android Studio, [skip this part](#android-studio).
+
+If you use Eclipse, you can find instructions on how to install the plugin [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing-eclipse-plugin).
 
 After installing it, go to the `File > New > Other…` menu and select `Dumbledroid Model file`.
 
@@ -55,6 +74,8 @@ Then, just paste the URL for the JSON or XML, tweak the settings and *aparecium*
 ![Dumbledroid input URL](https://dl.dropbox.com/u/5135185/blog/dumbledroid-input-url.png)
 
 If you want to manually write your classes, you'll need to create the fields that correspond to your JSON or XML document.
+
+<a name="android-studio"></a>
 
 For example, if you have a JSON like this:
 
