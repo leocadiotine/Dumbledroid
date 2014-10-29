@@ -25,7 +25,7 @@ apply plugin: 'maven'
 uploadArchives {
     repositories.mavenDeployer {
         repository(url: "file:///Users/leocadiotine/Desktop/maven-repository/")
-        pom.version = '1.0'
+        pom.version = '1.0.1'
         pom.groupId = 'io.leocad'
         pom.artifactId = 'dumbledroid'
     }
