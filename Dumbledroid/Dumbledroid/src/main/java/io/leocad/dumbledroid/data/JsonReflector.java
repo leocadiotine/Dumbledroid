@@ -40,6 +40,10 @@ public class JsonReflector {
 
 				String name = names.getString(i);
 
+                if (jsonObj.isNull(name)) {
+                    continue;
+                }
+
 				try {
 					Field field = ReflectionHelper.getFieldInHierarchy(modelClass, name);
 
