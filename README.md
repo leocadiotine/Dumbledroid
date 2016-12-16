@@ -1,6 +1,6 @@
 #Dumbledroid
 
-![Dumbledroid icon](https://dl.dropbox.com/u/5135185/blog/dumbledroid-icon.png)
+![Dumbledroid icon](http://static.leocad.io/dumbledroid-icon.png)
 
 Android + webservice = magic!
 
@@ -11,7 +11,7 @@ Download the [example app on Google Play](https://play.google.com/store/apps/det
 
 *Android Studio / Maven users*: `'io.leocad:dumbledroid:1.0'`
 
-*Eclipse users*: download the binary here: [dumbledroid-1.0.jar](https://dl.dropbox.com/u/5135185/blog/dumbledroid-1.0.jar).
+*Eclipse users*: download the binary here: [dumbledroid-1.0.jar](http://static.leocad.io/dumbledroid-1.0.jar).
 
 *Eclipse plugin*: install it using the update site: [http://leocad.io/dumbledroidplugin/](http://leocad.io/dumbledroidplugin/). Learn how to install the plugin [here](https://github.com/leocadiotine/Dumbledroid/wiki/Installing-eclipse-plugin).
 
